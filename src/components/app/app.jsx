@@ -7,17 +7,18 @@ import Modal from '../modal/modal';
 import OrderDetails from '../order-details/order-details';
 import IngredientDetails from '../ingredient-details/ingredient-details';
 
-const API = 'https://norma.nomoreparties.space/api/ingredients';
+const API = 'https://norma.nomoreparties.space/api';
 
 function App() {
   const [apiData, setApiData] = React.useState([]);
   const [orderVisible, setOrderVisible] = React.useState(false);
   const [ingredientVisible, setIngredientVisible] = React.useState(false);
   const [currentIngredient, setCurrentIngredient] = React.useState({});
+  const ECK_KEYCODE = 27;
 
   useEffect(() => {
     const close = (e) => {
-      if(e.keyCode === 27){
+      if(e.keyCode === ECK_KEYCODE){
         if(ingredientVisible) {
           setIngredientVisible(false)
         }
@@ -34,7 +35,7 @@ function App() {
   },[ingredientVisible, orderVisible]);
   
   useEffect(() => {
-    fetch(API)
+    fetch(`${API}/ingredients`)
         .then(res => {
           if (res.ok) {
               return res.json();

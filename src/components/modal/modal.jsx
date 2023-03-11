@@ -3,10 +3,13 @@ import { CloseIcon } from '@ya.praktikum/react-developer-burger-ui-components';
 import PropTypes from 'prop-types';
 import styles from './modal.module.css';
 import ModalOverlay from '../modal-overlay/modal-overlay';
+import ReactDOM from 'react-dom';
+const modalRoot = document.getElementById("modals");
 
 function Modal(props) {
-    return (
-      <ModalOverlay onClick={props.onClick}>
+    return ReactDOM.createPortal(
+      (
+        <>
         <div className={`${styles.root} pt-10 pr-10 pb-15 pl-10`} onClick={e => e.stopPropagation()}>
           <div className={styles.header}>
             { props.header && <h2 className="text_type_main-large">{props.header}</h2>}
@@ -16,8 +19,12 @@ function Modal(props) {
           </div>
             {props.children}
         </div>
-      </ModalOverlay>
-  );
+        <ModalOverlay onClick={props.onClick}/>
+      </>
+  ), 
+  modalRoot
+);
+
 };
 
 Modal.propTypes = {

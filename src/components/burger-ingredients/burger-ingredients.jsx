@@ -25,7 +25,7 @@ function BurgerIngredients(props) {
   return (
     <section className={`${styles.root} mr-10`}>
       <h1 className={`${styles.title} text_type_main-large mt-10 mb-5`}>Соберите бургер</h1>
-      <div style={{ display: 'flex' }} className={`mb-8`}>
+      <div className={`mb-8 ${styles.ingredients__tab}`}>
         {
           tabs.map((item) => (
             <Tab 

@@ -14,6 +14,10 @@
     flex: 1;
     overflow-y: auto;
   }
+
+  .ingredients__tab {
+    display: flex;
+  }
   
   .ingredients::-webkit-scrollbar {
       width: 12px;
