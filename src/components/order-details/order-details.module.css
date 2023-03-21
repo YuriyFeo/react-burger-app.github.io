@@ -1,29 +1,56 @@
-.root {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 520px;
-    width: 100%;
-    margin: 0 auto;
+.container {
+  height: 720px;
+  width: 718px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media screen and (max-height: 720px) {
+  .container {
+      height: 600px;
   }
-  
+
   .title {
-    text-align: center;
-    color: #F2F2F3;
-    text-shadow: 0px 0px 16px rgba(51, 51, 255, 0.25), 0px 0px 8px rgba(51, 51, 255, 0.25), 0px 4px 32px rgba(51, 51, 255, 0.5);
+      margin-top: 60px;
   }
-  
-  .subTitle {
-    margin-top: 0;
-    text-align: center;
+}
+
+.image {
+  width: 120px;
+  height: 120px;
+}
+
+.blink {
+  -webkit-animation: blink 3s infinite both;
+  animation: blink 3s infinite both;
+}
+
+@-webkit-keyframes blink {
+
+  0%,
+  50%,
+  100% {
+      opacity: 1;
   }
-  
-  .orderInfo {
-    text-align: center;
-    margin-top: 0;
+
+  25%,
+  75% {
+      opacity: 0;
   }
-  
-  .textColor {
-    color: #8585AD;
+}
+
+@keyframes blink {
+
+  0%,
+  50%,
+  100% {
+      opacity: 1;
   }
+
+  25%,
+  75% {
+      opacity: 0;
+  }
+}

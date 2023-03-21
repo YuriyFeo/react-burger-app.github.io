@@ -1,36 +1,37 @@
-.sectionTitle {
-    text-align: left;
-    color: #F2F2F3;
-  }
-  
-  .cardContainer {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    list-style: none;
-    margin: 0;
-  }
-  
-  .card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 272px;
-  }
-  
-  .price {
-    display: flex;
-    align-items: center;
-    color: #F2F2F3;
-  }
-  
-  .price svg {
-    margin-left: 9px;
-  }
-  
-  .name {
-    margin: 0;
-    height: 48px;
-    text-align: center;
-    color: #F2F2F3;
-  }
+.grid {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.container_price {
+  display: inline-block; 
+  vertical-align: middle; 
+}
+
+.price_price {
+  display: inline;
+  vertical-align: top; 
+  font-size: 40px;
+}
+
+.price,
+.name  {
+  text-align: center;
+  height: 48px;
+}
+
+.counter {
+position: absolute;  
+top: 0;
+right: 0;
+}
+
+.card {
+width: 272px;
+display: inline-block;
+position: relative;
+}
+
+.card :hover{
+cursor: pointer;
+}

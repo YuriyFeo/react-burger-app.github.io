@@ -1,17 +1,35 @@
-import React from 'react';
-import styles from './order-details.module.css';
-import doneIcon from '../../images/done.svg';
+import PropTypes from 'prop-types'
+import done from '../../images/done.png'
+import styles from './order-details.module.css'
 
-function OrderDetails() {
-  return (
-    <section className={`${styles.root}`}>
-      <span className={`${styles.title} text_type_digits-large mt-4 mb-8`}>034536</span>
-      <p className={`${styles.subTitle} text_type_main-medium mb-15`}>идентификатор заказа</p>
-      <img src={doneIcon} alt="" className="mb-15"/>
-      <p className={`${styles.orderInfo} text_type_main-default mb-2`}>Ваш заказ начали готовить</p>
-      <p className={`${styles.orderInfo} ${styles.textColor} text_type_main-default mb-2`}>Дождитесь готовности на орбитальной станции</p>
-    </section>
-  )
-};
+function OrderDetails({ order, isOrderPosting }) {
+    return (
+        <div className={styles.container}>
+            {isOrderPosting
+                ? <p className={`text text_type_digits-large mt-30  ${styles.title} ${styles.blink}`}>...</p>
+                : <p className={`text text_type_digits-large mt-30  ${styles.title}`}>{order.number} </p>
+            }
 
-export default OrderDetails;
+            {isOrderPosting
+                ? <p className={`text text_type_main-medium mt-8`}>...идет соединение... </p>
+                : <p className={`text text_type_main-medium mt-8`}>идентификатор заказа </p>
+            }
+
+            <div className={`mt-15 ${isOrderPosting && styles.blink}`}><img src={done} className={styles.image} alt=""/></div>
+
+            {!isOrderPosting &&
+                <>
+                    <p className="text text_type_main-default mt-15">Ваш заказ начали готовить</p>
+                    <p className="text text_type_main-default text_color_inactive mt-2">Дождитесь готовности на орбитальной станции</p>
+                </>
+            }
+        </div>
+    )
+}
+
+OrderDetails.propTypes = {
+    order: PropTypes.string,  
+    isOrderPosting: PropTypes.bool.isRequired
+}
+
+export default OrderDetails
