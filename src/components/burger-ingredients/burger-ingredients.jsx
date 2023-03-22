@@ -1,5 +1,6 @@
 import React, {useEffect, useRef,useContext} from 'react';
 import PropTypes from 'prop-types';
+import {ingredientType} from '../../utils/types';
 import { Tab  } from '@ya.praktikum/react-developer-burger-ui-components'
 import styles from './burger-ingredients.module.css' 
 import BurgerIngredientsItem from '../burger-ingredients-item/burger-ingredients-item.jsx';
@@ -66,7 +67,7 @@ export default function BurgerIngredients(props){
     return(
         <section className={`mr-5 mt-10 ${styles.container}`}>
             <p className="text text_type_main-large">Соберите бургер</p>
-            <div style={{ display: 'flex' }}>
+            <div className={`${styles.tab__block}`}>
                 <Tab value="bun" active={currentTab === 'bun'} onClick={onTabClick}>
                     Булки
                 </Tab>
@@ -107,20 +108,7 @@ export default function BurgerIngredients(props){
 }
 
 BurgerIngredients.propTypes = {
-    data: PropTypes.arrayOf({
-                _id: PropTypes.string.isRequired,
-                name: PropTypes.string.isRequired,
-                type: PropTypes.string.isRequired,
-                proteins: PropTypes.number.isRequired,
-                fat: PropTypes.number.isRequired,
-                carbohydrates: PropTypes.number.isRequired,
-                calories: PropTypes.number.isRequired,
-                price: PropTypes.number.isRequired,
-                image: PropTypes.string.isRequired,
-                image_mobile: PropTypes.string.isRequired,
-                image_large: PropTypes.string.isRequired,
-                __v: PropTypes.number.isRequired,
-              }),
+    data: PropTypes.arrayOf(ingredientType.isRequired),
     onAddIngredient: PropTypes.func.isRequired,
     onIngredientClick: PropTypes.func.isRequired,
 };

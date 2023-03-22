@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import styles from './ingredient-details.module.css';
+import {ingredientType} from '../../utils/types';
 
 function IngredientDetails({ingredient}){
     return(
@@ -8,7 +8,7 @@ function IngredientDetails({ingredient}){
                 <p className={`pl-10 text text_type_main-large`}>Детали ингредиента</p> 
             </div>
             <div className={"mt-8"}>
-                <img src={ingredient.image} className={styles.image} alt=""/>
+                <img src={ingredient.image} className={styles.image} alt={ingredient.name}/>
             </div>
             <p className="text text_type_main-medium mt-4">{ingredient.name}</p>  
             <div className={`${styles.details} mt-8`}>
@@ -42,20 +42,8 @@ function IngredientDetails({ingredient}){
     )
 }
 
-IngredientDetails.propTypes = {
-    ingredient: PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            proteins: PropTypes.number.isRequired,
-            fat: PropTypes.number.isRequired,
-            carbohydrates: PropTypes.number.isRequired,
-            calories: PropTypes.number.isRequired,
-            price: PropTypes.number.isRequired,
-            image: PropTypes.string.isRequired,
-            image_mobile: PropTypes.string.isRequired,
-            image_large: PropTypes.string.isRequired,
-            __v: PropTypes.number.isRequired,
-          })}
+        IngredientDetails.propTypes = {
+            ingredient: ingredientType,
+        }
 
 export default IngredientDetails

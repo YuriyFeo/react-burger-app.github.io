@@ -52,14 +52,19 @@ export default function MainLayout() {
       ])
     }
   }
+
+
+const checkResponse = (response) => {
+    if (!response.ok) {
+      return Promise.reject(response.status);
+    }
+    return response.json();
+  }
+
+
   const fetchData = () => {
     window.fetch(getUrl('ingredients'))
-      .then(response => {
-        if (!response.ok) {
-          return Promise.reject(response.status);
-        }
-        return response.json();
-      })
+      .then(checkResponse)
       .then(json => setData(json.data))
       .catch(e => console.log(e))
   }
@@ -75,12 +80,7 @@ export default function MainLayout() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ingredients: ids })
     })
-      .then(response => {
-        if (!response.ok) {
-          return Promise.reject(response.status);
-        }
-        return response.json();
-      })
+      .then(checkResponse)
       .then(json => {
         setOrder(json.order)
         setIsOrderPosting(false)

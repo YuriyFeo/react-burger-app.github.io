@@ -15,7 +15,8 @@ function OrderDetails({ order, isOrderPosting }) {
                 : <p className={`text text_type_main-medium mt-8`}>идентификатор заказа </p>
             }
 
-            <div className={`mt-15 ${isOrderPosting && styles.blink}`}><img src={done} className={styles.image} alt=""/></div>
+            <div className={`mt-15 ${isOrderPosting && styles.blink}`}>
+                <img src={done} className={styles.image} alt="✓"/></div>
 
             {!isOrderPosting &&
                 <>
@@ -28,7 +29,9 @@ function OrderDetails({ order, isOrderPosting }) {
 }
 
 OrderDetails.propTypes = {
-    order: PropTypes.string,  
+    order: PropTypes.shape({
+        _id: PropTypes.string,   
+      }),
     isOrderPosting: PropTypes.bool.isRequired
 }
 

@@ -70,7 +70,7 @@ export default function BurgerConstructor({onPerformOrderClick}){
                     </div>
 
                 </div>
-                <Button type="primary" size="large" onClick={onPerformOrderClick}>Оформить заказ</Button>
+                <Button type="primary" size="large"  value="" onClick={onPerformOrderClick}>Оформить заказ</Button>
              </div>            
         </section>    
     )

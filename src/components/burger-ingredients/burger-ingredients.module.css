@@ -22,3 +22,7 @@
   display: grid;
   grid-template-columns: auto auto;
 }
+
+.tab__block { 
+  display: flex;
+}

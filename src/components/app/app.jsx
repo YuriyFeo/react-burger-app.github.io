@@ -26,7 +26,7 @@ function App() {
 
 
   return (
-    <div style={{overflow: 'hidden'}}>
+    <div>
       <CartContext.Provider value={{cartState, cartDispatcher}}>
           <AppHeader/>
           <MainLayout/>
