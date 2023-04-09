@@ -1,114 +1,79 @@
-import React, {useEffect, useRef,useContext} from 'react';
-import PropTypes from 'prop-types';
-import {ingredientType} from '../../utils/types';
-import { Tab  } from '@ya.praktikum/react-developer-burger-ui-components'
-import styles from './burger-ingredients.module.css' 
-import BurgerIngredientsItem from '../burger-ingredients-item/burger-ingredients-item.jsx';
-import {CartContext } from '../../context/app-context';
+//  Блок (левый) с выбором ингредиентов по типам  //
+//  Для табов (типы ингредиентов) делаем состояние выбора таба  //
+//  Подумать над ограничением высоты блока на разных разрешениях   //
+//  Фильтруем ингредиенты по типам и кладем в массивы  //
+//  Затем в разметку вставляем карточки ингредиентов по типам  //
 
-export default function BurgerIngredients(props){
+import React, { useState, useEffect, useMemo } from 'react';
+//  Добавил хуки для работы с Redux  //
+import { useSelector, useDispatch } from 'react-redux';
+//  Modal, IngredientDetails и IngredientPrice теперь в IngredientItem  //
+//  IngredientItem теперь вложен в IngredientCategory для навигации  //
+import { IngredientCategory } from '../ingredient-category/ingredient-category';
+import { Tab } from '@ya.praktikum/react-developer-burger-ui-components'
+import { getIngredients } from '../../services/actions/ingredient-actions';
+//  PropTypes и контекст больше не нужны  //
+import BurgerIngredientsStyle from './burger-ingredients.module.css';
+     
+const BurgerIngredients = () => {
 
-    const bunRef = useRef(null)
-    const sauceRef = useRef(null)
-    const mainRef = useRef(null)
-    const listRef = useRef(null)
+  //  Теперь получаю состояние из redux, а не из контекста  //
+  //  Включаю хуки для получения и отправки данные в redux  //
+  const ingredients = useSelector((state) => state.ingredients.ingredients);
+  const dispatch = useDispatch();
+  //  По умолчанию мой ингредиент = булка, без булки нельзя  //
+  const [current, setCurrent] = useState('bun');
+  
+  //  При монтировании получаем список ингредиентов  //
+  useEffect(() => {
+    dispatch(getIngredients());
+  }, []);
 
-    const [currentTab, setCurrentTab] = React.useState('bun')
-    const [groupedCart, setGroupedCart] = React.useState({})
-    const {cartState} = useContext(CartContext);
+  //  Фильтрую массив по типу нужного ингредиента  //
+  const buns = useMemo(
+    () => ingredients.filter((item) => item.type === 'bun'),
+    [ingredients]
+  );
+  const sauces = useMemo(
+    () => ingredients.filter((item) => item.type === 'sauce'),
+    [ingredients]
+  );
+  const mains = useMemo(
+    () => ingredients.filter((item) => item.type === 'main'),
+    [ingredients]
+  );
 
+  //  Нахожу по id контейнер, привязываюсь к его координатам, чтобы выделять разделы  //
+  const scrollToCategory = () => {
+    const topTop = document.getElementById('typeContainer').getBoundingClientRect().top;
+    const bunTop = document.getElementById('bun').getBoundingClientRect().top;
+    const sauceTop = document.getElementById('sauce').getBoundingClientRect().top;
 
-    useEffect(() => {
-        const newGroupedCart = {}
-        cartState.cart.forEach(element => {           
-           if  (newGroupedCart[element._id]===undefined){
-             if (element.type==='bun')  {
-                newGroupedCart[element._id] = 2
-             }
-             else{
-                newGroupedCart[element._id] = 1
-             }
-           }
-           else{
-            newGroupedCart[element._id] = newGroupedCart[element._id] +1
-           }
-        });        
-        setGroupedCart(newGroupedCart)
-    }, [cartState.cart])
-
-    const handleScroll = e =>{
-        const position =listRef.current.scrollTop +264
-        if (sauceRef.current.offsetTop > position){
-            setCurrentTab('bun')
-        }
-        else if (mainRef.current.offsetTop > position && position >=sauceRef.current.offsetTop){
-            setCurrentTab('sauce')
-        }
-        else{
-            setCurrentTab('main')
-        }
+    //  topTop - верх раздела, butTop - верх "булок", sauceTop - соусов  //
+    if (bunTop + topTop > topTop + 60) {
+      setCurrent('bun');
+    } else if (sauceTop + topTop > 110) {
+      setCurrent('sauce');
+    } else {
+      setCurrent('main');
     }
+  };
 
-    const onTabClick =(value) =>{
-        setCurrentTab(value);
-        switch (value){
-            case 'bun':
-                bunRef.current.scrollIntoView({behavior: "smooth"});
-                break;
-            case 'sauce':
-                sauceRef.current.scrollIntoView({behavior: "smooth"});
-                break;
-                default :
-                mainRef.current.scrollIntoView({behavior: "smooth"});
-                break;
-        }
-    }
-
-    return(
-        <section className={`mr-5 mt-10 ${styles.container}`}>
-            <p className="text text_type_main-large">Соберите бургер</p>
-            <div className={`${styles.tab__block}`}>
-                <Tab value="bun" active={currentTab === 'bun'} onClick={onTabClick}>
-                    Булки
-                </Tab>
-                <Tab value="sauce" active={currentTab === 'sauce'} onClick={onTabClick}>
-                    Соусы
-                </Tab>
-                <Tab value="main" active={currentTab === 'main'} onClick={onTabClick}>
-                    Начинки
-                </Tab>
-            </div>
-            <div className={`${styles.list}`} onScroll={handleScroll} ref={listRef}>
-                <p className="mt-10 text text_type_main-medium" ref={bunRef}>Булки</p>
-                <BurgerIngredientsItem 
-                    data={props.data} 
-                    groupedCart={groupedCart} 
-                    type={'bun'} 
-                    onAddIngredient={props.onAddIngredient}
-                    onIngredientClick={props.onIngredientClick}
-                />
-                <p className="mt-10 text text_type_main-medium" ref={sauceRef}>Соусы</p>
-                <BurgerIngredientsItem 
-                    data={props.data} 
-                    groupedCart={groupedCart} 
-                    type={'sauce'} 
-                    onAddIngredient={props.onAddIngredient}
-                    onIngredientClick={props.onIngredientClick}
-                />
-                <p className="mt-10 text text_type_main-medium" ref={mainRef}>Начинки</p>
-                <BurgerIngredientsItem 
-                    data={props.data} 
-                    groupedCart={groupedCart} type={'main'} 
-                    onAddIngredient={props.onAddIngredient} 
-                    onIngredientClick={props.onIngredientClick}
-                />
-            </div>            
-        </section>    
-    )
+  return (
+    <section className={`mr-10 ${BurgerIngredientsStyle.ingredients}`}> 
+      <h1 className='mb-5 text text_type_main-large'>Соберите бургер</h1>
+      <nav className={BurgerIngredientsStyle.navbar}>
+        <Tab active={current === 'bun'}>Булки</Tab>
+        <Tab active={current === 'sauce'}>Соусы</Tab>
+        <Tab active={current === 'main'}>Начинки</Tab>
+      </nav>
+      <div className={BurgerIngredientsStyle.ingredient_types} id='typeContainer' onScroll={scrollToCategory}>
+        <IngredientCategory type={'Булки'} typeList={buns} id='bun' />
+        <IngredientCategory type={'Соусы'} typeList={sauces} id='sauce' />
+        <IngredientCategory type={'Начинки'} typeList={mains} id='main' />
+      </div>
+    </section>
+  );
 }
 
-BurgerIngredients.propTypes = {
-    data: PropTypes.arrayOf(ingredientType.isRequired),
-    onAddIngredient: PropTypes.func.isRequired,
-    onIngredientClick: PropTypes.func.isRequired,
-};
+export default BurgerIngredients;

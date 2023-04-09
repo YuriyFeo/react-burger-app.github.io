@@ -1,38 +1,23 @@
-import {useReducer} from 'react';
-import AppHeader from '../app-header/app-header';
-import MainLayout from '../main-layout/main-layout';
-import {CartContext } from '../../context/app-context';
+import AppHeader from "../app-header/app-header";
+import BurgerIngredients from "../burger-ingredients/burger-ingredients";
+import BurgerConstructor from "../burger-constructor/burger-constructor";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndProvider } from "react-dnd";
+import appStyle from "./app.module.css";
 
-const  initialCartState= {cart:[],totalPrice: 0}
-
-export function cartReducer(state, action){
-  switch (action.type) {
-    case "load":
-      return {cart: action.ingredients, totalPrice: action.ingredients.reduce((prev,curr)=>prev+curr.price, 0) };
-    case "add":
-       return {
-          cart: [...state.cart, action.ingredient], 
-          totalPrice: state.totalPrice + action.ingredient.price
-        }
-    case "reset":
-      return initialCartState;
-    default:
-      throw new Error(`Wrong type of action: ${action.type}`);
-  }
-}
-
-function App() {
-  const [cartState, cartDispatcher] = useReducer(cartReducer, initialCartState, undefined);
-
-
+const App = () => {
   return (
-    <div>
-      <CartContext.Provider value={{cartState, cartDispatcher}}>
-          <AppHeader/>
-          <MainLayout/>
-      </CartContext.Provider>
+    <div > 
+       <AppHeader />
+      <main className={appStyle.mainContainer}>
+       {/* Добавил провайдер для DragNDrop  */}
+        <DndProvider backend={HTML5Backend}>
+          <BurgerIngredients />
+          <BurgerConstructor />
+        </DndProvider>
+      </main>
     </div>
   );
-}
+};
 
 export default App;

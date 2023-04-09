@@ -1,38 +1,27 @@
-import PropTypes from 'prop-types'
-import done from '../../images/done.png'
-import styles from './order-details.module.css'
+//  Компонент для показа в модальном окне по нажатию кнопки 'Заказать' //
+import React from 'react';
+import PropTypes from 'prop-types';
+import orderDetailsStyle from './order-details.module.css';
+import orderStatusImage from '../../images/done.png'
 
-function OrderDetails({ order, isOrderPosting }) {
-    return (
-        <div className={styles.container}>
-            {isOrderPosting
-                ? <p className={`text text_type_digits-large mt-30  ${styles.title} ${styles.blink}`}>...</p>
-                : <p className={`text text_type_digits-large mt-30  ${styles.title}`}>{order.number} </p>
-            }
-
-            {isOrderPosting
-                ? <p className={`text text_type_main-medium mt-8`}>...идет соединение... </p>
-                : <p className={`text text_type_main-medium mt-8`}>идентификатор заказа </p>
-            }
-
-            <div className={`mt-15 ${isOrderPosting && styles.blink}`}>
-                <img src={done} className={styles.image} alt="✓"/></div>
-
-            {!isOrderPosting &&
-                <>
-                    <p className="text text_type_main-default mt-15">Ваш заказ начали готовить</p>
-                    <p className="text text_type_main-default text_color_inactive mt-2">Дождитесь готовности на орбитальной станции</p>
-                </>
-            }
-        </div>
-    )
+const OrderDetails = ({ orderNumber }) => {
+  
+  //  Теперь не использую контекст заказа для получения номера заказа  //
+  //  Вставляю в разметку номер заказа из пропс  //
+  return(
+    <div className={orderDetailsStyle.container}>
+      <p className='mt-4 mb-8 text text_type_digits-large'>{orderNumber}</p>
+      <p className='mb-15 text text_type_main-medium'>идентификатор заказа</p>
+      <img className={orderDetailsStyle.image} src={orderStatusImage} alt='галочка подтверждения заказа'></img>
+      <p className='mt-15 mb-2 text text_type_main-default'>Ваш заказ начали готовить</p>
+      <p className='mb-15 text text_type_main-default text_color_inactive'>Дождитесь готовности на орбитальной станции</p>
+    </div>  
+  )    
 }
 
+//  Здесь есть пропсы, проверяю типизацию  //
 OrderDetails.propTypes = {
-    order: PropTypes.shape({
-        _id: PropTypes.string,   
-      }),
-    isOrderPosting: PropTypes.bool.isRequired
-}
+  orderNumber: PropTypes.number,
+};
 
-export default OrderDetails
+export default OrderDetails;

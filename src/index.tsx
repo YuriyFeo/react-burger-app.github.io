@@ -1,18 +1,25 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import ReactDOM from 'react-dom/client';
+//  Добавляю поддержку redux  //
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
 import App from './components/app/app';
-import reportWebVitals from './reportWebVitals';
-// import * as ReactDOMClient from 'react-dom/client';
+//  Подключаем корневой редьюсер и усилитель  //
+import { rootReducer } from './services/reducers/root-reducer';
+import { enhancer } from './services/store/store';
+import './index.css';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+//  Создал подключение к redux store с усилителем  //
+const store = createStore(rootReducer, enhancer); 
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+//  обернул App в провайдер redux для доступа к store  //
+root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </React.StrictMode>
+);

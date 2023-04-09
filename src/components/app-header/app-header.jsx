@@ -1,30 +1,27 @@
-import appStyles from './app-header.module.css';
+//  Из UI-библиотеки: лого, иконки, типо, отступы  //
 
-import { 
-  BurgerIcon,
-  ListIcon,
-  Logo,
-  ProfileIcon
-} from '@ya.praktikum/react-developer-burger-ui-components';
+import React from 'react';
+import { Logo, BurgerIcon, ListIcon,  ProfileIcon} from '@ya.praktikum/react-developer-burger-ui-components';
+import AppHeaderStyle from './app-header.module.css';
 
-function AppHeader() {
+const AppHeader = () => {
   return (
-    <header className={`${appStyles.header} pt-4 pb-4`}>
-      <nav className={appStyles.nav}>
-        <a href="##" className={`${appStyles.button} pt-4 pr-5 pb-4 pl-5 mr-2`}>
-          <BurgerIcon type="primary" />
-          <span className={`${appStyles.button_text} ${appStyles.button_text_active} ml-2 text_type_main-default`}>Конструктор</span>
+    <header className={` pt-4 pb-4 ${AppHeaderStyle.header}`}>  
+      <nav className={AppHeaderStyle.navbar}>
+        <a href='/' className={`mt-4 mr-7 mb-4 ${AppHeaderStyle.navitem}`}>  
+          <BurgerIcon type='primary' />
+          <p className='ml-2 text text_type_main-default'>Конструктор</p>
         </a>
-        <a href="##" className={`${appStyles.button} pt-4 pr-5 pb-4 pl-5 mr-2`}>
-          <ListIcon type="secondary" />
-          <span className={`${appStyles.button_text} ml-2 text_type_main-default`}>Лента заказов</span>
+        <a href='/feed' className={`mt-4 mr-5 mb-4 ml-5 ${AppHeaderStyle.navitem}`}>  
+          <ListIcon type='secondary' />
+          <p className='ml-2 text text_type_main-default'>Лента заказов</p>
         </a>
-        <a href="##" className={appStyles.logo}>
+        <a href='/' className={AppHeaderStyle.logo}>  
           <Logo />
         </a>
-        <a href="##" className={`${appStyles.button} pt-4 pr-5 pb-4 pl-5 mr-2`}>
-          <ProfileIcon type="secondary" />
-          <span className={`${appStyles.button_text} ml-2 text_type_main-default`}>Личный кабинет</span>
+        <a href='/profile' className={`mt-4 mb-4 ml-5 ${AppHeaderStyle.navitem}`}>  
+          <ProfileIcon type='secondary' />
+          <p className='ml-2 text text_type_main-default'>Личный кабинет</p>
         </a>
       </nav>
     </header>
