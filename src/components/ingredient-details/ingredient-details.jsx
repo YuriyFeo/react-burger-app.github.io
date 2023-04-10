@@ -1,23 +1,7 @@
 //  Компонент для отображения в модальном окне при клике на ингредиент  //
-import PropTypes from 'prop-types';
-//  import { ingredientType } from '../../utils/types';  //
+import { ingredientType } from '../../utils/types';  //
 import ingredientDetailsStyle from './ingredient-details.module.css';
-
-//  Вложенный компонент КБЖУ свойства ингредиента - вынести в отдельный  //
-const IngredientNutrition = ({ type, amount }) => {
-  return (
-    <div className={ingredientDetailsStyle.nutrition}>
-      <p className='mb-2 text text_type_main-default text_color_inactive'>{type}</p>
-      <p className='text text_type_digits-default text_color_inactive'>{amount}</p>
-    </div>
-  )
-}
-
-//  Типизация есть  //
-IngredientNutrition.propTypes = {
-  type: PropTypes.string.isRequired,
-  amount: PropTypes.number.isRequired
-};
+import IngredientNutrition from '../ingredient-nutrition/ingredient-nutrition';
 
 //  Сводный компонент с гридом свойств  //
 const IngredientDetails = ({ item }) => {
@@ -37,7 +21,7 @@ const IngredientDetails = ({ item }) => {
 
 //  Здесь есть пропсы, проверяю типизацию, но не через ingredientType  //
 IngredientDetails.propTypes = {
-  item: PropTypes.object.isRequired,
+  item: ingredientType,
 };
 
 export default IngredientDetails;

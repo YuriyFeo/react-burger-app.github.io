@@ -4,7 +4,7 @@
 //  Фильтруем ингредиенты по типам и кладем в массивы  //
 //  Затем в разметку вставляем карточки ингредиентов по типам  //
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 //  Добавил хуки для работы с Redux  //
 import { useSelector, useDispatch } from 'react-redux';
 //  Modal, IngredientDetails и IngredientPrice теперь в IngredientItem  //
@@ -59,18 +59,53 @@ const BurgerIngredients = () => {
     }
   };
 
+  //Делаем скролл на раздел
+
+	const bunRef = useRef(null);
+	const sauceRef = useRef(null);
+	const mainRef = useRef(null);
+	const listRef = useRef(null);
+
+	const onTabClick = useCallback((value) => {
+		setCurrent(value);
+		switch (value) {
+			case "bun":
+				bunRef.current.scrollIntoView({ behavior: "smooth" });
+				break;
+			case "sauce":
+				sauceRef.current.scrollIntoView({ behavior: "smooth" });
+				break;
+			case "main":
+				mainRef.current.scrollIntoView({ behavior: "smooth" });
+				break;
+			default:
+				bunRef.current.scrollIntoView({ behavior: "smooth" });
+				break;
+		}
+	}, []);
+
+
   return (
     <section className={`mr-10 ${BurgerIngredientsStyle.ingredients}`}> 
       <h1 className='mb-5 text text_type_main-large'>Соберите бургер</h1>
       <nav className={BurgerIngredientsStyle.navbar}>
-        <Tab active={current === 'bun'}>Булки</Tab>
-        <Tab active={current === 'sauce'}>Соусы</Tab>
-        <Tab active={current === 'main'}>Начинки</Tab>
+        <Tab value="bun" active={current === 'bun'} onClick={onTabClick}>Булки</Tab>
+        <Tab value="sauce" active={current === 'sauce'} onClick={onTabClick}>Соусы</Tab>
+        <Tab value="main" active={current === 'main'} onClick={onTabClick}>Начинки</Tab>
       </nav>
-      <div className={BurgerIngredientsStyle.ingredient_types} id='typeContainer' onScroll={scrollToCategory}>
-        <IngredientCategory type={'Булки'} typeList={buns} id='bun' />
-        <IngredientCategory type={'Соусы'} typeList={sauces} id='sauce' />
-        <IngredientCategory type={'Начинки'} typeList={mains} id='main' />
+      <div className={BurgerIngredientsStyle.ingredient_types} id='typeContainer' onScroll={scrollToCategory}  ref={listRef}>
+      <p className="mt-10 text text_type_main-medium" ref={bunRef}>
+					Булки
+				</p>
+        <IngredientCategory typeList={buns} id='bun'/>
+        <p className="mt-10 text text_type_main-medium" ref={sauceRef}>
+					Соусы
+				</p>
+        <IngredientCategory typeList={sauces} id='sauce'/>
+        <p className="mt-10 text text_type_main-medium" ref={mainRef}>
+					Начинки
+				</p>
+        <IngredientCategory typeList={mains} id='main'/>
       </div>
     </section>
   );

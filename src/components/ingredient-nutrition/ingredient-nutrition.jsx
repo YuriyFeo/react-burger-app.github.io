@@ -1,5 +1,4 @@
-//  Вложенный компонент КБЖУ свойств ингредиента  //
-import { ingredientType } from '../../utils/types';
+import PropTypes from 'prop-types';
 import IngredientNutritionStyle from './ingredient-nutrition.module.css';
 
 const IngredientNutrition = ({ type, amount }) => {
@@ -13,8 +12,8 @@ const IngredientNutrition = ({ type, amount }) => {
 
 //  Здесь есть пропсы, проверяю типизацию  //
 IngredientNutrition.propTypes = {
-  type: ingredientType.string.isRequired,
-  amount: ingredientType.number.isRequired
+  type: PropTypes.string.isRequired,
+  amount: PropTypes.number.isRequired
 };
 
 export default IngredientNutrition;

@@ -24,7 +24,7 @@ const IngredientFilter = ({ ingredients, type, openModal }) => {
 }
 
 IngredientFilter.propTypes = {
-  ingredients: PropTypes.arrayOf(ingredientType.isRequired).isRequired,
+  ingredients: PropTypes.arrayOf(ingredientType).isRequired,
   type: PropTypes.string.isRequired,
   openModal: PropTypes.func.isRequired,
 };

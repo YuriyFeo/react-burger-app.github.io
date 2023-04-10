@@ -1,6 +1,8 @@
 //  Карточка ингредиента, используемая в BurgerIngredients  //
 //  Из UI-библиотеки: счётчики, иконку валюты, типо, отступы  //
-import React, { useCallback } from 'react';
+import { ingredientType } from '../../utils/types';  //
+
+import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useDrag } from 'react-dnd';
 
@@ -16,11 +18,10 @@ import {
 } from '../../services/actions/ingredient-actions';
 
 //  import { ingredientType } from '../../utils/types';
-import PropTypes from 'prop-types';
+
 import IngredientItemStyle from './ingredient-item.module.css';
 
 export const IngredientItem = ( { ingredientData } ) => {
-  //  состояния [isOpen, setIsOpen] больше не нужны  //
   //  Активирую хуки для работы с redux  //
   const dispatch = useDispatch();
   const ingredientDetails = useSelector(
@@ -30,8 +31,8 @@ export const IngredientItem = ( { ingredientData } ) => {
   const orderData = useSelector((state) => state.order.orderData);
 
   //  Считаю сколько ингредиентов в заказе, булки на 2 //
-  const orderCount = useCallback(
-    (ingredientData) => {
+  const orderCount = useMemo(
+    () => {
       const { _id, type } = ingredientData;
       const ingredientsCount = orderData.filter(
         (element) => element._id === _id
@@ -62,8 +63,8 @@ export const IngredientItem = ( { ingredientData } ) => {
   return (
     <div>
       <div className={IngredientItemStyle.ingredient} onClick={handleOpenIngredientModal} ref={dragRef}>
-        {orderCount(ingredientData) > 0 &&
-          <Counter className={IngredientItemStyle.counter} count={orderCount(ingredientData)} size='default' />
+        {orderCount > 0 &&
+          <Counter className={IngredientItemStyle.counter} count={orderCount} size='default' />
         }
         <img src={ingredientData.image} alt={ingredientData.name}></img>
         <IngredientPrice price={ingredientData.price} />
@@ -80,5 +81,5 @@ export const IngredientItem = ( { ingredientData } ) => {
 
 //  Здесь есть пропсы, проверяю типизацию  //
 IngredientItem.propTypes = {
-  elementData: PropTypes.object
+  elementData: ingredientType,
 };

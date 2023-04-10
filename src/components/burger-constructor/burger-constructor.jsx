@@ -23,12 +23,17 @@ const BurgerConstructor = () => {
   const { orderData, orderNumber } = useSelector(selectorOrders);
   
   //  Редьюсеры со свитчем и действия вынес в отдельные файлы  //
-  const bun = orderData.find(function (element) {
-    return element.type === 'bun';
-  });
-  
+
+	const bun = useMemo(() => {
+		return orderData.find((element) => element.type === "bun");
+	}, [orderData]);
+
+
+
   //  Начинку и соус можно не разделять, т.к. логика едина  //
-  const ingredientsMidStuff = orderData.filter((element) => element.type !== 'bun');
+  const ingredientsMidStuff = useMemo(() => {
+		return orderData.filter((element) => element.type !== 'bun');
+  }, [orderData]);
   
   //  Считаю сумму заказа с мемоизацией  //
   //  Прибавляю к старой сумме заказа (если не пуст) цены элементов (булки * 2)  //

@@ -20,7 +20,6 @@ const ConstructorElements = ({ elementData, bunType, isLocked, bunTypeName, inde
   const ref = React.useRef(null);
   
   //  Все элементы, кроме булки, можно перетаскивать  //
-  //  Refactor: переименовать функцию, она возвращает компонент, а не буль  //
   //  Убрал функцию isDraggable за ненадобностью  //
   
   //  Буду вычитать стоимость элемента при его удалении из заказа  //
