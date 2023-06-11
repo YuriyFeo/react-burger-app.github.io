@@ -1,6 +1,7 @@
+//  Взято из https://reactjs.org/docs/typechecking-with-proptypes.html  //
 import PropTypes from 'prop-types';
 
-export const ingredientType = PropTypes.shape({
+const cardPropTypes = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
@@ -14,3 +15,5 @@ export const ingredientType = PropTypes.shape({
   image_large: PropTypes.string.isRequired,
   __v: PropTypes.number.isRequired,  
 }).isRequired;
+
+export default cardPropTypes;

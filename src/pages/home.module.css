@@ -1,0 +1,12 @@
+.mainContainer {
+  display: flex;
+  justify-content: center;
+  height: calc(100vh - 128px);
+  padding: 88px 40px 40px;
+}
+
+.loading {
+  padding-top: 40px;
+  grid-area: loading;
+  justify-self: center;
+}

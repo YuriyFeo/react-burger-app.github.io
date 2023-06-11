@@ -1,5 +1,5 @@
-//  Редьюсер для обработки заказов в redux store   //
-//  Импортирую actions для заказов  //
+//  Редьюсер для обработки заказов в redux store  
+//  Импортирую actions для заказов 
 import {
   ADD_INGREDIENT,
   MOVE_INGREDIENT,
@@ -11,7 +11,7 @@ import {
   DELETE_ORDER
 } from '../actions/order-actions';
 
-//  Начальное состояние заказа: пустой массив, null номер, нет запроса и ошибок  //
+//  Начальное состояние заказа: пустой массив, null номер, нет запроса и ошибок 
 const initialOrderState = {
   orderData: [],
   orderNumber: null,
@@ -19,16 +19,16 @@ const initialOrderState = {
   orderRequestFailed: false
 };
 
-//  Меняю состояние в сторе в зависимости от типа action  //
+//  Меняю состояние в сторе в зависимости от типа action
 export const orderReducer = (state = initialOrderState, action) => {
   switch (action.type) {
-    //  Для добавления булки нахожу ее индекс в заказе по типу элемента 'bun'  //
+    //  Для добавления булки нахожу ее индекс в заказе по типу элемента 'bun' 
     case ADD_BUN: {
-      //  Задаю текущую позицию булки для сортировки заказа  //
+      //  Задаю текущую позицию булки для сортировки заказа 
       const bunIndex = state.orderData.findIndex(
         (elem) => elem.type === 'bun'
       );
-      //  Запоминаю контент action с добавлением булки  //
+      //  Запоминаю контент action с добавлением булки 
       const bun = action.payload;
       
       //  Сначала создаю копию того, что есть в заказе сейчас  //
