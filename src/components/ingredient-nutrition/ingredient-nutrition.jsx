@@ -1,7 +1,9 @@
+//  Вынес КБЖУ свойств ингредиента в отдельный компонент  //
+import React from 'react';
 import PropTypes from 'prop-types';
 import IngredientNutritionStyle from './ingredient-nutrition.module.css';
 
-const IngredientNutrition = ({ type, amount }) => {
+export const IngredientNutrition = ({ type, amount }) => {
   return (
     <div className={IngredientNutritionStyle.nutrition}>
       <p className='mb-2 text text_type_main-default text_color_inactive'>{type}</p>
@@ -16,5 +18,4 @@ IngredientNutrition.propTypes = {
   amount: PropTypes.number.isRequired
 };
 
-export default IngredientNutrition;
- 
+export default React.memo(IngredientNutrition);

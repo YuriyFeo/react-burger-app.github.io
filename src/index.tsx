@@ -3,7 +3,10 @@ import ReactDOM from 'react-dom/client';
 //  Добавляю поддержку redux  //
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import App from './components/app/app';
+//  Переключился на корневой App  //
+import App from './app';
+//  Добавил поддержку роутера  // 
+import { BrowserRouter } from 'react-router-dom';
 //  Подключаем корневой редьюсер и усилитель  //
 import { rootReducer } from './services/reducers/root-reducer';
 import { enhancer } from './services/store/store';
@@ -19,7 +22,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+    <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>
 );
