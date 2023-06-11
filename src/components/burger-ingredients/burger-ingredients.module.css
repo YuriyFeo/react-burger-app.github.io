@@ -1,34 +1,62 @@
-.root {
-    display: flex;
-    flex-direction: column;
-    max-width: 600px;
-    width: 100%;
+.ingredients {
+	width: 600px;
+	/* height: 912px; */
+	margin: 0;
   }
   
-  .title {
-    text-align: left;
-    color: #F2F2F3;
+  .navbar {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
   }
   
-  .ingredients {
-    flex: 1;
-    overflow-y: auto;
+  .ingredient_type {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+
+  }
+  
+  .ingredient {
+	max-width: 272px;
+	display: grid;
+	gap: 4px;
+	justify-items: center;
+	position: relative;
+	cursor: pointer;
+  }
+  
+  .ingredient_types {
+	height: calc(100vh - 324px);
+	overflow-x: hidden;
+	overflow-y: auto;
+	scrollbar-color: #8585ad #2f2f37;	
   }
 
-  .ingredients__tab {
-    display: flex;
+  .ingredient_types::-webkit-scrollbar {
+	width: 8px;
+  }
+  .ingredient_types::-webkit-scrollbar-track {
+	background: #2f2f37;
+  }
+  .ingredient_types::-webkit-scrollbar-thumb {
+	background-color: #8585ad;
+  }
+
+  
+
+
+  /* .ingredient_types::-webkit-scrollbar {
+	width: 8px;
+	background-color: var(--color-scrollbar);
   }
   
-  .ingredients::-webkit-scrollbar {
-      width: 12px;
+  .ingredient_types::-webkit-scrollbar-thumb {
+	background-color: var(--color-scrollbar-thumb);
+  }
+   */
+  .counter {
+	position: absolute;
+	top: 0;
+	right: 0;
   }
   
-  .ingredients::-webkit-scrollbar-track {
-      background: #2F2F37;
-  }
-  
-  .ingredients::-webkit-scrollbar-thumb {
-      background: #8585AD;
-      border: 3px solid #2F2F37;
-      border-radius: 6px;
-  }

@@ -1,16 +1,21 @@
-import React from 'react';
+//  Оверлей при открытии модального окна, затемняет фон  //
+
 import PropTypes from 'prop-types';
-import styles from './modal-overlay.module.css';
+import modalOverlayStyles from './modal-overlay.module.css';
 
-function ModalOverlay(props) {
-     return (
-          <div className={styles.root} onClick={props.onClick}>
-          </div>
-        )
-};
+//  При клике на оверлей закрываем открытое модальное окно  //
+const ModalOverlay = ({children, handleClose}) => {
+  return(
+    <div className={modalOverlayStyles.container} onClick={handleClose}>
+        {children}
+    </div>  
+  )
+}
 
+//  Здесь есть пропсы, проверяю типизацию  //
 ModalOverlay.propTypes = {
-  onClick: PropTypes.func.isRequired
+  children: PropTypes.element.isRequired,
+  handleClose: PropTypes.func.isRequired
 }
 
 export default ModalOverlay;

@@ -1,50 +1,27 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import styles from './ingredient-details.module.css';
+//  Компонент для отображения в модальном окне при клике на ингредиент  //
+import { ingredientType } from '../../utils/types';  //
+import ingredientDetailsStyle from './ingredient-details.module.css';
+import IngredientNutrition from '../ingredient-nutrition/ingredient-nutrition';
 
-function IngredientDetails(props) {
-
-  return (
-    <section className={styles.root}>
-      <img src={props.currentIngredient.image_large} alt="" />
-      <h4 className="text_type_main-medium mb-8 mt-4">{props.currentIngredient.name}</h4>
-      <div className={`${styles.info}`}>
-        <div className={`${styles.infoItem} mr-5`}>
-          <span className="text_type_main-default mb-2">Калории,ккал</span>
-          <span className="text_type_digits-default">{props.currentIngredient.calories}</span>
-        </div>
-        <div className={`${styles.infoItem} mr-5`}>
-          <span className="text_type_main-default mb-2">Белки, г</span>
-          <span className="text_type_digits-default">{props.currentIngredient.proteins}</span>
-        </div>
-        <div className={`${styles.infoItem} mr-5`}>
-          <span className="text_type_main-default mb-2">Жиры, г</span>
-          <span className="text_type_digits-default">{props.currentIngredient.fat}</span>
-        </div>
-        <div className={`${styles.infoItem}`}>
-          <span className="text_type_main-default mb-2">Углеводы, г</span>
-          <span className="text_type_digits-default">{props.currentIngredient.carbohydrates}</span>
-        </div>
+//  Сводный компонент с гридом свойств  //
+const IngredientDetails = ({ item }) => {
+  return(
+    <div className={ingredientDetailsStyle.general}>
+      <img className={ingredientDetailsStyle.image} src={item.image} alt={item.name}></img>
+      <p className='mt-4 mb-8 text text_type_main-medium'>{item.name}</p>
+      <div className={ingredientDetailsStyle.details}>
+        <IngredientNutrition type={'Калории, ккал'} amount={item.calories} />
+        <IngredientNutrition type={'Белки, г'} amount={item.proteins} />
+        <IngredientNutrition type={'Жиры, г'} amount={item.fat} />
+        <IngredientNutrition type={'Углеводы, г'} amount={item.carbohydrates} />
       </div>
-    </section>
-  )
-};
+    </div>  
+  )    
+}
 
-IngredientDetails.propTypes = { 
-  currentIngredient: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    proteins: PropTypes.number,
-    fat: PropTypes.number,
-    carbohydrates: PropTypes.number,
-    calories: PropTypes.number,
-    price: PropTypes.number,
-    image: PropTypes.string,
-    image_mobile: PropTypes.string,
-    image_large: PropTypes.string,
-    __v: PropTypes.number
-  }).isRequired
+//  Здесь есть пропсы, проверяю типизацию, но не через ingredientType  //
+IngredientDetails.propTypes = {
+  item: ingredientType,
 };
 
 export default IngredientDetails;

@@ -1,17 +1,27 @@
+//  Компонент для показа в модальном окне по нажатию кнопки 'Заказать' //
 import React from 'react';
-import styles from './order-details.module.css';
-import doneIcon from '../../images/done.svg';
+import PropTypes from 'prop-types';
+import orderDetailsStyle from './order-details.module.css';
+import orderStatusImage from '../../images/done.png'
 
-function OrderDetails() {
-  return (
-    <section className={`${styles.root}`}>
-      <span className={`${styles.title} text_type_digits-large mt-4 mb-8`}>034536</span>
-      <p className={`${styles.subTitle} text_type_main-medium mb-15`}>идентификатор заказа</p>
-      <img src={doneIcon} alt="" className="mb-15"/>
-      <p className={`${styles.orderInfo} text_type_main-default mb-2`}>Ваш заказ начали готовить</p>
-      <p className={`${styles.orderInfo} ${styles.textColor} text_type_main-default mb-2`}>Дождитесь готовности на орбитальной станции</p>
-    </section>
-  )
+const OrderDetails = ({ orderNumber }) => {
+  
+  //  Теперь не использую контекст заказа для получения номера заказа  //
+  //  Вставляю в разметку номер заказа из пропс  //
+  return(
+    <div className={orderDetailsStyle.container}>
+      <p className='mt-4 mb-8 text text_type_digits-large'>{orderNumber}</p>
+      <p className='mb-15 text text_type_main-medium'>идентификатор заказа</p>
+      <img className={orderDetailsStyle.image} src={orderStatusImage} alt='галочка подтверждения заказа'></img>
+      <p className='mt-15 mb-2 text text_type_main-default'>Ваш заказ начали готовить</p>
+      <p className='mb-15 text text_type_main-default text_color_inactive'>Дождитесь готовности на орбитальной станции</p>
+    </div>  
+  )    
+}
+
+//  Здесь есть пропсы, проверяю типизацию  //
+OrderDetails.propTypes = {
+  orderNumber: PropTypes.number,
 };
 
 export default OrderDetails;
