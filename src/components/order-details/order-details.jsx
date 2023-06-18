@@ -1,27 +1,26 @@
-//  Компонент для показа в модальном окне по нажатию кнопки 'Заказать' //
 import React from 'react';
-import PropTypes from 'prop-types';
-import orderDetailsStyle from './order-details.module.css';
-import orderStatusImage from '../../images/done.png'
+import styles from './order-details.module.css';
 
-const OrderDetails = ({ orderNumber }) => {
-  
-  //  Теперь не использую контекст заказа для получения номера заказа  //
-  //  Вставляю в разметку номер заказа из пропс  //
-  return(
-    <div className={orderDetailsStyle.container}>
-      <p className='mt-4 mb-8 text text_type_digits-large'>{orderNumber}</p>
-      <p className='mb-15 text text_type_main-medium'>идентификатор заказа</p>
-      <img className={orderDetailsStyle.image} src={orderStatusImage} alt='галочка подтверждения заказа'></img>
-      <p className='mt-15 mb-2 text text_type_main-default'>Ваш заказ начали готовить</p>
-      <p className='mb-15 text text_type_main-default text_color_inactive'>Дождитесь готовности на орбитальной станции</p>
-    </div>  
-  )    
+import graphics from '../../images/graphics.svg'
+import { useSelector } from 'react-redux';
+
+export default function OrderDetails() {
+
+  const orderNumber = useSelector(store => store.order.order.number);
+
+  return (
+    <>
+      <p className={`${styles.order_number} text text_type_digits-large mt-30`}>{orderNumber}</p>
+      <p className="text text_type_main-medium mt-8">
+        Идентификатор заказа
+      </p>
+      <img className='mt-15' src={graphics} alt='галка' />
+      <p className="text text_type_main-default mt-15">
+        Ваш заказ начали готовить
+      </p>
+      <p className="text text_type_main-default text_color_inactive mt-2 mb-30">
+        Дождитесь готовности на орбитальной станции
+      </p>
+    </>
+  );
 }
-
-//  Здесь есть пропсы, проверяю типизацию  //
-OrderDetails.propTypes = {
-  orderNumber: PropTypes.number,
-};
-
-export default OrderDetails;

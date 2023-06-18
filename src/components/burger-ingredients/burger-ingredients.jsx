@@ -1,114 +1,109 @@
-//  Блок (левый) с выбором ингредиентов по типам  //
-//  Для табов (типы ингредиентов) делаем состояние выбора таба  //
-//  Подумать над ограничением высоты блока на разных разрешениях   //
-//  Фильтруем ингредиенты по типам и кладем в массивы  //
-//  Затем в разметку вставляем карточки ингредиентов по типам  //
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useInView } from 'react-hook-inview';
+import styles from './burger-ingredients.module.css';
+import {
+  Tab
+} from '@ya.praktikum/react-developer-burger-ui-components';
+import BurgerIngredient from '../burger-ingredient/burger-ingredient';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-//  Добавил хуки для работы с Redux  //
-import { useSelector, useDispatch } from 'react-redux';
-//  Modal, IngredientDetails и IngredientPrice теперь в IngredientItem  //
-//  IngredientItem теперь вложен в IngredientCategory для навигации  //
-import { IngredientCategory } from '../ingredient-category/ingredient-category';
-import { Tab } from '@ya.praktikum/react-developer-burger-ui-components'
-import { getIngredients } from '../../services/actions/ingredient-actions';
-//  PropTypes и контекст больше не нужны  //
-import BurgerIngredientsStyle from './burger-ingredients.module.css';
-     
-const BurgerIngredients = () => {
 
-  //  Теперь получаю состояние из redux, а не из контекста  //
-  //  Включаю хуки для получения и отправки данные в redux  //
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
-  const dispatch = useDispatch();
-  //  По умолчанию мой ингредиент = булка, без булки нельзя  //
-  const [current, setCurrent] = useState('bun');
-  
-  //  При монтировании получаем список ингредиентов  //
+export default function BurgerIngredients() {
+
+  const location = useLocation();
+
+  const [bunRef, bunInView] = useInView();
+  const [sauceRef, sauceInView] = useInView();
+  const [mainRef, mainInView] = useInView();
+
+  const id = useParams();
+
+  const [current, setCurrent] = useState('Булки');
+
+  const ingredients = useSelector(store => store.burgerIngredients.ingredients);
+
   useEffect(() => {
-    dispatch(getIngredients());
-  }, []);
-
-  //  Фильтрую массив по типу нужного ингредиента  //
-  const buns = useMemo(
-    () => ingredients.filter((item) => item.type === 'bun'),
-    [ingredients]
-  );
-  const sauces = useMemo(
-    () => ingredients.filter((item) => item.type === 'sauce'),
-    [ingredients]
-  );
-  const mains = useMemo(
-    () => ingredients.filter((item) => item.type === 'main'),
-    [ingredients]
-  );
-
-  //  Нахожу по id контейнер, привязываюсь к его координатам, чтобы выделять разделы  //
-  const scrollToCategory = () => {
-    const topTop = document.getElementById('typeContainer').getBoundingClientRect().top;
-    const bunTop = document.getElementById('bun').getBoundingClientRect().top;
-    const sauceTop = document.getElementById('sauce').getBoundingClientRect().top;
-
-    //  topTop - верх раздела, butTop - верх "булок", sauceTop - соусов  //
-    if (bunTop + topTop > topTop + 60) {
-      setCurrent('bun');
-    } else if (sauceTop + topTop > 110) {
-      setCurrent('sauce');
-    } else {
-      setCurrent('main');
+    if (bunInView) {
+      setCurrent('Булки')
+    } else if (sauceInView) {
+      setCurrent('Соусы')
+    } else if (mainInView) {
+      setCurrent('Начинки')
     }
-  };
-
-  //Делаем скролл на раздел
-
-	const bunRef = useRef(null);
-	const sauceRef = useRef(null);
-	const mainRef = useRef(null);
-	const listRef = useRef(null);
-
-	const onTabClick = useCallback((value) => {
-		setCurrent(value);
-		switch (value) {
-			case "bun":
-				bunRef.current.scrollIntoView({ behavior: "smooth" });
-				break;
-			case "sauce":
-				sauceRef.current.scrollIntoView({ behavior: "smooth" });
-				break;
-			case "main":
-				mainRef.current.scrollIntoView({ behavior: "smooth" });
-				break;
-			default:
-				bunRef.current.scrollIntoView({ behavior: "smooth" });
-				break;
-		}
-	}, []);
-
+  }, [bunInView, sauceInView, mainInView]);
 
   return (
-    <section className={`mr-10 ${BurgerIngredientsStyle.ingredients}`}> 
-      <h1 className='mb-5 text text_type_main-large'>Соберите бургер</h1>
-      <nav className={BurgerIngredientsStyle.navbar}>
-        <Tab value="bun" active={current === 'bun'} onClick={onTabClick}>Булки</Tab>
-        <Tab value="sauce" active={current === 'sauce'} onClick={onTabClick}>Соусы</Tab>
-        <Tab value="main" active={current === 'main'} onClick={onTabClick}>Начинки</Tab>
-      </nav>
-      <div className={BurgerIngredientsStyle.ingredient_types} id='typeContainer' onScroll={scrollToCategory}  ref={listRef}>
-      <p className="mt-10 text text_type_main-medium" ref={bunRef}>
-					Булки
-				</p>
-        <IngredientCategory typeList={buns} id='bun'/>
-        <p className="mt-10 text text_type_main-medium" ref={sauceRef}>
-					Соусы
-				</p>
-        <IngredientCategory typeList={sauces} id='sauce'/>
-        <p className="mt-10 text text_type_main-medium" ref={mainRef}>
-					Начинки
-				</p>
-        <IngredientCategory typeList={mains} id='main'/>
+    <section className={`${styles.burger_ingredients} mr-10`}>
+      <h1 className="text text_type_main-large mt-10">
+        Соберите бургер
+      </h1>
+      <div className={`${styles.tab} mt-5`}>
+        <Tab value="Булки" active={current === "Булки"} onClick={setCurrent}>
+          Булки
+        </Tab>
+        <Tab value="Соусы" active={current === "Соусы"} onClick={setCurrent}>
+          Соусы
+        </Tab>
+        <Tab value="Начинки" active={current === "Начинки"} onClick={setCurrent}>
+          Начинки
+        </Tab>
       </div>
-    </section>
+      <section className='mt-10'>
+        <ul className={styles.burger_ingredients_bar}>
+          <li>
+            <h2 className="text text_type_main-medium" ref={bunRef}>
+              Булки
+            </h2>
+            <ul className={`${styles.burger_ingredients_list} mt-6 ml-4`}>
+              {ingredients.map((item) => {
+                if (item.type === 'bun') {
+                  return (
+                    <Link to={`/ingredients/${item._id}`} key={`Link_${item._id}`} className={styles.ingredient_link} state={{ background: location, currentIngredient: item }}>
+                      <BurgerIngredient ingredient={item} />
+                    </Link>
+                  )
+                }
+              }
+              )}
+            </ul>
+          </li>
+          <li>
+            <h2 className="text text_type_main-medium mt-10" ref={sauceRef}>
+              Соусы
+            </h2>
+            <ul className={`${styles.burger_ingredients_list} mt-6 ml-4`}>
+              {ingredients.map((item) => {
+                if (item.type === 'sauce') {
+                  return (
+                    <Link to={`/ingredients/${item._id}`} key={`Link_${item._id}`} className={styles.ingredient_link} state={{ background: location, currentIngredient: item }}>
+                      <BurgerIngredient key={item._id} ingredient={item} />
+                    </Link>
+                  )
+                }
+              }
+              )}
+            </ul>
+          </li>
+          <li>
+            <h2 className="text text_type_main-medium mt-10" ref={mainRef}>
+              Начинки
+            </h2>
+            <ul className={`${styles.burger_ingredients_list} mt-6 ml-4`}>
+              {ingredients.map((item) => {
+                if (item.type === 'main') {
+                  return (
+                    <Link to={`/ingredients/${item._id}`} key={`Link_${item._id}`} className={styles.ingredient_link} state={{ background: location, currentIngredient: item }}>
+                      <BurgerIngredient key={item._id} ingredient={item} />
+                    </Link>
+                  )
+                }
+              }
+              )}
+            </ul>
+          </li>
+        </ul>
+      </section>
+    </section >
   );
 }
-
-export default BurgerIngredients;

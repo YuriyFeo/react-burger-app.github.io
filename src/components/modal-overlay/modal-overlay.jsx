@@ -1,21 +1,28 @@
-//  Оверлей при открытии модального окна, затемняет фон  //
-
+import React from 'react';
 import PropTypes from 'prop-types';
-import modalOverlayStyles from './modal-overlay.module.css';
+import styles from './modal-overlay.module.css';
+import { useSelector } from 'react-redux';
 
-//  При клике на оверлей закрываем открытое модальное окно  //
-const ModalOverlay = ({children, handleClose}) => {
-  return(
-    <div className={modalOverlayStyles.container} onClick={handleClose}>
-        {children}
-    </div>  
-  )
+export default function ModalOverlay ({ children, handleCloseModal }) {
+
+  const { isRequest, currentModal } = useSelector(store => store.modal);
+
+  const openModal = () => {
+     if (isRequest || currentModal) {
+      return styles.modal_overlay_open;
+    } else {
+      return '';
+    }
+  }
+
+  return (
+    <div className={`${styles.modal_overlay} ${openModal()}`} onClick={handleCloseModal}>
+      {children}
+    </div>
+  );
 }
 
-//  Здесь есть пропсы, проверяю типизацию  //
 ModalOverlay.propTypes = {
-  children: PropTypes.element.isRequired,
-  handleClose: PropTypes.func.isRequired
+  children: PropTypes.element,
+  handleCloseModal: PropTypes.func
 }
-
-export default ModalOverlay;

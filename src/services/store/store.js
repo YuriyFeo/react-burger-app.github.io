@@ -1,6 +1,7 @@
 //  Создаю redux store и переношу сюда усилители  //
-import { applyMiddleware, compose } from 'redux';
+import { compose, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import { rootReducer } from '../reducers';
 
 //  Подключаю Redux DevTools  //
 const composeEnhancers =
@@ -8,4 +9,6 @@ const composeEnhancers =
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
     : compose;
 
-export const enhancer = composeEnhancers(applyMiddleware(thunk));
+const enhancer = composeEnhancers(applyMiddleware(thunk));
+//  Создал подключение к redux store с усилителем  //
+export const store = createStore(rootReducer, enhancer);
