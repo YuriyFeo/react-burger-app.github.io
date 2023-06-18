@@ -1,67 +1,68 @@
-//  Страница для восстановления пароля
-/*  На /forgot-password пользователь вводит адрес email и нажимает «Восстановить». 
-После этого происходит POST запрос к эндпоинту /password-reset  */
-//  Нужны хуки для redux 
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-//  хук для работы с формами 
-import { useForm } from '../hooks/useForm';
-import { requestResetCode } from '../services/actions/auth-actions';
-//  Шапка и компоненты из UX-библиотеки 
-import { AppHeader } from '../components/app-header/app-header';
-import { Button, Input } from '@ya.praktikum/react-developer-burger-ui-components';
-//  Стили пока беру из login
-import PasswordStyles from './login.module.css';
+import { EmailInput, Button } from "@ya.praktikum/react-developer-burger-ui-components";
+import styles from './form.module.css';
+import { forgotPasswordReset } from '../utils/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from '../hooks/use-form';
 
-export const ForgotPasswordPage = () => {
+export function ForgotPasswordPage() {
+
+  const location = useLocation();
+
+
+
+  const { values, handleChange } = useForm({
+    email: '',
+  })
+
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  //  Отправляю экшен, после успешного запроса, записываю данные в Redux 
-  //  С помощью useSelector получаю доступ к данным пользователя. 
-  const { hasResetCode } = useSelector((state) => state.auth);
-  const { data, handleDataChange } = useForm({ email: '' });
-  
-  //  Обрабатываю нажатие кнопки Забыли пароль - отправляю экшен 
-  const submitForgotPassword = (e) => {
-    e.preventDefault();
-    dispatch(requestResetCode(data));
-  };
 
-  //  если уже есть код, отправляю на reset-password 
-  if (hasResetCode) {
-    return <Navigate to={'/reset-password'} />;
+  const onClickResetPassword = (e) => {
+    e.preventDefault();
+
+    forgotPasswordReset(values)
+    .then(() => {
+      navigate('/reset-password', { state: location })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   }
 
-  //  Разметка: шапка, flex-контейнер с grid-формой внутри 
+  const onLoginClick = () => {
+    navigate('/login');
+  }
+
   return (
-    <div>
-      <AppHeader />
-      <div className={PasswordStyles.container}>
-        <form className={PasswordStyles.form} onSubmit={submitForgotPassword}>
-          <h1 className='text text_type_main-medium'>Восстановление пароля</h1>
-          <Input
-            type={'email'}
-            placeholder={'Укажите e-mail'}
-            onChange={handleDataChange}
-            value={data.email}
-            name={'email'}
-          />
-          <Button htmlType='submit' type='primary' size='medium'>
-            Восстановить
-          </Button>
-        </form>
-        <p className='text text_type_main-default'>
-          Вспомнили пароль?
-          <Button
-            onClick={() => navigate('/login')}
-            htmlType='button'
-            type='secondary'
-            size='medium'
+    <form className={`${styles.form}`} onSubmit={onClickResetPassword}>
+      <h2 className={`text text_type_main-medium mb-6`}>Восстановление пароля</h2>
+      <EmailInput
+        name={'email'}
+        isIcon={false}
+        extraClass="mb-6"
+        placeholder="Укажите e-mail"
+        onChange={handleChange}
+        value={values.email}
+      />
+      <Button
+        htmlType="submit"
+        type="primary"
+        size="medium"
+        extraClass="mb-20"
+        >
+        Восстановить
+      </Button>
+      <p className="text text_type_main-default text_color_inactive">
+        Вспомнили пароль?
+        <Button
+          htmlType="button"
+          type="secondary"
+          size="medium"
+          extraClass={`${styles.secondary_button}`}
+          onClick={onLoginClick}
           >
-            Войти
-          </Button>
-        </p>
-      </div>
-    </div>
+          Войти
+        </Button>
+      </p>
+    </form>
   );
 }

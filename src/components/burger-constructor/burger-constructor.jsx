@@ -1,184 +1,134 @@
-/* eslint-disable array-callback-return */
-//  Блок (правый) с конструктором заказа бургера из выбранных ингредиентов  //
-
-import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-//  Добавил хуки для работы с DND  - здесь не нужен useDrag  //
-import { useDrop } from "react-dnd";
-import ConstructorElements from "../constructor-elements/constructor-elements";
-import OrderDetails from "../order-details/order-details";
-import ConstructorTotal from "../constructor-total/constructor-total";
+import { useMemo, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styles from './burger-constructor.module.css';
+import { BurgerConstructorElement } from '../burger-constructor-element/burger-constructor-element';
 import {
-  Button,
   ConstructorElement,
-} from "@ya.praktikum/react-developer-burger-ui-components";
-import { Modal } from "../modal/modal";
-import {
-  dispatchOrder,
-  ADD_BUN,
-  ADD_INGREDIENT,
-  DELETE_ORDER,
-} from "../../services/actions/order-actions";
-//  Импортировал actions для работы с ингредиентами в конструкторе заказа  //
-//  Добавил универсальный генератор уникальных идентификаторов для элементов без id  //
-import { v4 as uuidv4 } from "uuid";
-import { selectorOrders } from "../../utils/constants";
-import burgerConstructorStyle from "./burger-constructor.module.css";
+  CurrencyIcon,
+  Button
+} from '@ya.praktikum/react-developer-burger-ui-components';
+import { v4 as uuidv4 } from 'uuid';
 
-export const BurgerConstructor = () => {
-  //  Отправляю экшен, после успешного запроса, записываю данные в Redux  //
-  //  С помощью useSelector получаю доступ к данным о заказах. PROFIT!  //
+import { useDrop } from 'react-dnd';
+
+import { getConstructorIngredient, addIngredientToConstructor } from '../../services/actions/burger-constructor';
+import { ORDER_RESET, sentOrderNumber } from '../../services/actions/order';
+import { SET_MODAL } from '../../services/actions/modal';
+import OrderDetails from '../order-details/order-details';
+import { useNavigate } from 'react-router-dom';
+
+export default function BurgerConstructor() {
+
+  const temporaryIngredients = useSelector(store => store.burgerIngredients.ingredients)
+
+  const ingredients = useSelector(store => store.constructor.ingredients);
+  const bun = useSelector(store => store.constructor.bun);
+
+  const userData = useSelector(store => store.auth);
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  //  Получаю из redux store данные заказа  //
-  const { orderData, orderNumber } = useSelector(selectorOrders);
-  //  Получаю из redux store состояние авторизации пользователя  //
-  const user = useSelector((state) => state.auth.user);
 
-  //  Редьюсеры со свитчем и действия вынес в отдельные файлы  //
-  //  Вместо первых встречных теперь нахожу выбранные элементы  //
-  const bun = orderData.find(function (element) {
-    return element.type === "bun";
-  });
-  //  Пока что начинку и соус можно не разделять, т.к. логика едина  //
-  const ingredientsMidStuff = orderData.filter(
-    (element) => element.type !== "bun"
-  );
+  useEffect(() => {
+    dispatch(getConstructorIngredient([]))
+  }, [dispatch])
 
-  //  Считаю сумму заказа с мемоизацией  //
-  //  Прибавляю к старой сумме заказа (если не пуст) цены элементов (булки * 2)  //
-  const totalAmount = useMemo(() => {
-    //  let orderTotal = 0; переделал на объект orderData и reduce  //
-    if (orderData.length > 0) {
-      return orderData
-        .map((element) => element.price * (element.type === "bun" ? 2 : 1))
-        .reduce((sum, price) => sum + price, 0);
-    } else {
-      //  Если в заказе нет данных, то возвращаем 0  //
-      return 0;
+  const [, constructorDrop] = useDrop({
+    accept: 'ingredients',
+    drop(itemId) {
+      const newIngredient = { ...temporaryIngredients.find(item => item._id === itemId._id) }
+      newIngredient.uuid = uuidv4();
+
+      const newIngredients = [...ingredients, newIngredient]
+
+      dispatch(addIngredientToConstructor(newIngredient, bun, itemId, newIngredients));
     }
-  }, [orderData]);
-
-  const onDropIngredient = (ingredient) => {
-    if (ingredient.type === "bun") {
-      dispatch({
-        type: ADD_BUN,
-        payload: { _uid: uuidv4(), ...ingredient },
-      });
-    } else {
-      dispatch({
-        type: ADD_INGREDIENT,
-        payload: { _uid: uuidv4(), ...ingredient },
-      });
-    }
-  };
-
-  const [, dropTarget] = useDrop({
-    accept: "ingredient",
-    drop: (ingredientData) => onDropIngredient(ingredientData),
   });
 
-  //  Если авторизован, открываю окно с деталями заказа, если нет -> логин  //
-  const handleOpenIngredientModal = () => {
-    user
-      ? dispatch(dispatchOrder(orderData.map((ingredient) => ingredient._id)))
-      : navigate("/login");
-  };
+  const moveIngredient = (dragIndex, hoverIndex) => {
+    const dragIngredient = ingredients[dragIndex];
+    const newIngredients = [...ingredients];
+    newIngredients.splice(dragIndex, 1);
+    newIngredients.splice(hoverIndex, 0, dragIngredient);
 
-  const handleCloseOrderModal = () => {
-    dispatch({ type: DELETE_ORDER });
-  };
+    dispatch(getConstructorIngredient(newIngredients))
+    
+  }
 
-  //  Цены суммирую и вывожу в конструкторе, в попапе вывожу номер заказа  //
-  //  Добавил ref, отключил контекст провайдер, теперь беру состояние из redux-стора  //
-  //  Открытие окна с деталями ингредиента вынес в отдельную функцию handleOpenIngredientModal  //
-  //  Открываю окно заказа при условии, что есть номер заказа, закрытие вынес в handleCloseOrderModal  //
-  //  Показываю сумму заказа и кнопку, только если выбраны ингредиенты (кроме булок)  //
+  const [, sortDropRef] = useDrop({
+    accept: 'sort',
+  })
+
+  const getUnchangeableItems = (isTop) => {
+    if (bun) {
+      return (
+        <li className={`${styles.item} ${isTop ? 'mb-4' : 'mt-4'} ml-8 pr-4`}>
+          <ConstructorElement
+            type={isTop ? 'top' : 'bottom'}
+            isLocked={true}
+            text={`${bun.name} ${isTop ? '(Верх)' : '(Низ)'}`}
+            price={bun.price}
+            thumbnail={bun.image}
+          />
+        </li>
+      )
+    }
+  }
+
+  const totalPrice = useMemo(() => {
+    if (bun) {
+      const bunsTotal = bun.price * 2;
+      if (ingredients && ingredients.length > 0) {
+        const ingredientsTotal = ingredients.reduce((prev, item) => {
+          return prev + item.price
+        }, 0);
+        return ingredientsTotal + bunsTotal;
+      }
+      return bunsTotal
+    }
+  }, [ingredients, bun]);
+
+  const handleOrder = () => {
+    if(!userData.user) {
+      navigate('/login');
+    } else {
+      const ingredientsId = [...ingredients].map(item => item._id);
+      dispatch({
+        type: SET_MODAL,
+        currentModal: <OrderDetails />,
+        resetActionType: ORDER_RESET
+      })
+      dispatch(sentOrderNumber([ bun._id, ...ingredientsId]));
+    }
+  }
+
   return (
-    <>
-      <section
-        className={`${burgerConstructorStyle.element__section}`}
-        ref={dropTarget}
-      >
-        <div className={`${burgerConstructorStyle.element__container}`}>
-          <ul className={`${burgerConstructorStyle.element__list}`}>
-            {bun && (
-              <li className={`${burgerConstructorStyle.element__bun}`}>
-                <ConstructorElement
-                  type={"top"}
-                  isLocked={true}
-                  text={`${bun.name} (верх)`}
-                  price={bun.price}
-                  thumbnail={bun.image}
-                />
-              </li>
-            )}
-
-            <ul className={`${burgerConstructorStyle.element_midstuff}`}>
-              {ingredientsMidStuff.map((element, index) => {
-                return (
-                  <li
-                    key={element._id}
-                    className={burgerConstructorStyle.element}
-                  >
-                    <ConstructorElements
-                      elementData={element}
-                      bunType={""}
-                      bunTypeName={""}
-                      isLocked={false}
-                      index={index}
-                      key={element._id}
-                    />
-                  </li>
-                );
-              })}
-              {ingredientsMidStuff.length === 0 && (
-                <li className={burgerConstructorStyle.element}>
-                  <span className="text mt-30 text_type_main-default">
-                    Добавьте ингредиенты для Вашего бургера!
-                  </span>
-                </li>
-              )}
-            </ul>
-            {bun && (
-              <li className={`${burgerConstructorStyle.element__bun}`}>
-                <ConstructorElement
-                  type={"bottom"}
-                  isLocked={true}
-                  text={`${bun.name} (низ)`}
-                  price={bun.price}
-                  thumbnail={bun.image}
-                />
-              </li>
-            )}
+    <section className='pl-4' ref={constructorDrop}>
+      <ul className={`${styles.items} mt-25`}>
+        {getUnchangeableItems(true)}
+        <li>
+          <ul className={styles.changeable_items} ref={sortDropRef}>
+            {ingredients &&
+              ingredients.map((item, index) => {
+                if (!(item.type === 'bun')) {
+                  return <BurgerConstructorElement key={item.uuid} {...item} moveIngredient={moveIngredient} index={index} />
+                }
+              })
+            }
           </ul>
+        </li>
+        {getUnchangeableItems(false)}
+      </ul>
+      {bun ?
+        <div className={`${styles.total} mt-10 pr-4`}>
+          <p className="text text_type_digits-medium mr-10">{totalPrice}<CurrencyIcon type="primary" /></p>
+          <Button htmlType="button" type="primary" size="medium" onClick={handleOrder}>
+            Оформить заказ
+          </Button>
         </div>
-        {ingredientsMidStuff.length > 0 && (
-          <div className={`mt-10 ${burgerConstructorStyle.constructor_total}`}>
-            <ConstructorTotal total={totalAmount} />
-
-            <Button
-              type="primary"
-              size="large"
-              htmlType="button"
-              onClick={handleOpenIngredientModal}
-            >
-              Оформить заказ
-            </Button>
-          </div>
-        )}
-      </section>
-      {orderNumber && (
-        <Modal handleClose={handleCloseOrderModal} title={"Детали заказа"}>
-          <OrderDetails orderNumber={orderNumber} />
-        </Modal>
-      )}
-    </>
+        : null
+      }
+    </section>
   );
-};
-
-//  Типизация не нужна, нет пропсов  //
-
-export default React.memo(BurgerConstructor);
+}

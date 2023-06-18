@@ -5,10 +5,10 @@ import { ForgotPasswordPage } from './forgot-password';
 import { ResetPasswordPage } from './reset-password';
 import { HomePage } from './home';
 import { ProfilePage } from './profile';
-import { IngredientPage } from './ingredient';
-import { OrdersPage } from './orders';
+import { IngredientsPage } from './ingredients';
 import { FeedPage } from './feed';
-import { NotFoundPage } from './not-found';
+
+import { NotFoundPage } from './NotFound';
 
 export {
   RegisterPage,
@@ -17,8 +17,7 @@ export {
   ResetPasswordPage,
   HomePage,
   ProfilePage,
-  IngredientPage,
-  OrdersPage,
+  IngredientsPage,
   FeedPage,
-  NotFoundPage,
+  NotFoundPage
 };

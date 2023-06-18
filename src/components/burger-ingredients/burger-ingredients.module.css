@@ -1,62 +1,51 @@
-.ingredients {
-	width: 600px;
-	/* height: 912px; */
-	margin: 0;
-  }
-  
-  .navbar {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-  }
-  
-  .ingredient_type {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+.burger_ingredients {
+  max-width: 600px;
+}
 
-  }
-  
-  .ingredient {
-	max-width: 272px;
-	display: grid;
-	gap: 4px;
-	justify-items: center;
-	position: relative;
-	cursor: pointer;
-  }
-  
-  .ingredient_types {
-	height: calc(100vh - 324px);
-	overflow-x: hidden;
-	overflow-y: auto;
-	scrollbar-color: #8585ad #2f2f37;	
-  }
+.burger_ingredients:last-child {
+  margin-right: 0;
+}
 
-  .ingredient_types::-webkit-scrollbar {
-	width: 8px;
-  }
-  .ingredient_types::-webkit-scrollbar-track {
-	background: #2f2f37;
-  }
-  .ingredient_types::-webkit-scrollbar-thumb {
-	background-color: #8585ad;
-  }
+.burger_ingredients_bar {
+  height: 650px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0 ;
+}
 
-  
+.burger_ingredients_bar::-webkit-scrollbar {
+  width: 8px;
+}
 
+.burger_ingredients_bar::-webkit-scrollbar-track {
+  background-color: #2F2F37;
+}
 
-  /* .ingredient_types::-webkit-scrollbar {
-	width: 8px;
-	background-color: var(--color-scrollbar);
-  }
-  
-  .ingredient_types::-webkit-scrollbar-thumb {
-	background-color: var(--color-scrollbar-thumb);
-  }
-   */
-  .counter {
-	position: absolute;
-	top: 0;
-	right: 0;
-  }
-  
+.burger_ingredients_bar::-webkit-scrollbar-thumb {
+  background-color: #8585AD;
+}
+
+.tab {
+  display: flex;
+}
+
+.burger_ingredients_list {
+  display: flex;
+  list-style: none;
+  margin-bottom: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  row-gap: 32px;
+}
+
+.ingredient_link {
+  text-decoration: none;
+  color: white;
+  margin-right: 24px;
+}
+
+.ingredient_link:nth-child(2n) {
+  margin-right: 0;
+}

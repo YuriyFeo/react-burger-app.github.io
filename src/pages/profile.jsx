@@ -1,127 +1,139 @@
-/*
-Экран маршрута /profile. Пользователь попадает сюда по кнопке «Личный кабинет». Роутинг:
-1) При попадании на страницу профиля сначала открывается маршрут /profile. 
-2) Ссылка «Профиль» становится активной.
-3 позже) Клик по «История заказов» открывает /profile/orders => активная ссылка «История заказов»
-4 позже) Клик по заказу в «Истории заказов» открывает экран /profile/orders/:id.
-5 позже) Ссылка «Выход» пока ничего не делает. Потом logout 
-*/
-//  хуки для состояний и обновления полей ввода формы  //
-import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-import { useForm } from '../hooks/useForm';
-//  шапка и левая навигация профиля  //
-import { AppHeader } from '../components/app-header/app-header';
-import { ProfileNav } from '../components/profile-nav/profile-nav';
-//  кнопка, поле ввода и поле пароля из библиотеки  //
-import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-//  нужен action для обновления профиля через redux  //
-import { updateUserProfile } from '../services/actions/auth-actions';
-import ProfileStyle from './profile.module.css';
+import { Button, EmailInput, Input, PasswordInput } from "@ya.praktikum/react-developer-burger-ui-components";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { editProfileInfoRequest, logoutRequest } from "../utils/api";
+import { deleteCookie, getCookie } from "../utils/utils";
+import { GET_USER_SUCCESS, USER_LOGOUT } from "../services/actions/auth";
+import styles from './profile.module.css';
+import { useForm } from "../hooks/use-form";
 
-export const ProfilePage = () => {
-  //  по ТЗ пока не делаю реальный пароль и валидацию  //
-  //  Отправляю экшен, после успешного запроса, записываю данные в Redux  //
-  //  С помощью useSelector получаю доступ к данным об пользователе. PROFIT!  //
-  //  Примерно как в тренажере  //
-  const dispatch = useDispatch(); 
-  const user = useSelector((state) => state.auth.user);
-  let passwordValue = '******';
-  const [isChanged, setIsChanged] = useState(false);
 
-  //  Задаю начальные значения для профиля  //
-  const { data, setData } = useForm({
-    email: user.email,
-    password: passwordValue,
-    name: user.name,
-  });
+export  function ProfilePage() {
+  const inputNameRef = useRef();
 
-  //  Обрабатываю изменения в поле ввода  //
-  const onChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-    setIsChanged(true);
-  };
+  const userData = useSelector(store => store.auth.user);
 
-  //  Обрабатываю отправку формы  //
-  const submitForm = () => {
-    dispatch(
-      updateUserProfile({
-        email: data.email,
-        name: data.name,
-        password: data.password !== passwordValue ? data.password : undefined
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const [isDisabled, setIsDisabled] = useState(true);
+
+  const { values, handleChange, setValues } = useForm({
+    name: userData.name,
+    email: userData.email,
+    password: ''
+  })
+
+  const onIconClickName = () => {
+    setIsDisabled(false);
+    setTimeout(() => inputNameRef.current.focus(), 0)
+  }
+
+  const onBlurName = () => {
+    setIsDisabled(true);
+  }
+
+  const onClickLogoutButton = () => {
+    logoutRequest(getCookie('token'))
+      .then(() => {
+        deleteCookie('token');
+        dispatch({
+          type: USER_LOGOUT
+        })
+        navigate('/login');
       })
-    );
-    setIsChanged(false);
-  };
+      .catch((err) => {
+        console.log(err)
+      })
+  }
 
-  //  Обрабатываю отмену отправки формы  //
-  const cancelSubmit = () => {
-    setData({
-      email: user.email,
-      name: user.name,
-      password: passwordValue,
-    });
-    setIsChanged(false);
-  };
+  const onClickSubmit = (e) => {
+    e.preventDefault();
 
-  //  Разметка: контейнер, шапка, навменю, форма с полями ввода, кнопка  //
+    editProfileInfoRequest(userData.accessToken, values)
+      .then(data => {
+        dispatch({
+          type: GET_USER_SUCCESS,
+          user: {
+            ...userData.user,
+            email: data.user.email,
+            name: data.user.name
+          }
+        })
+      })
+  }
+
+  const onReset = () => {
+    setValues({
+      email: userData.email,
+      name: userData.name,
+      password: ''
+    })
+  }
+
+  const buttons = (
+    <>
+      <Button htmlType="reset" type="secondary" size="medium" extraClass="mt-6">Отмена</Button>
+      <Button htmlType="submit" type="primary" size="medium" extraClass="mt-6">Сохранить</Button>
+    </>
+  )
   return (
-    <div>
-      <AppHeader />
-      <div className={ProfileStyle.profile__container}>
-        <ProfileNav
-          navTip={'В этом разделе вы можете изменить свои персональные данные'}
+    <section className={styles.section}>
+      <nav className={`${styles.navigation} mr-15`}>
+        <ul className={styles.navigation_menu}>
+          <li className={`${styles.navigation_item}`}>
+            <Link className={`${styles.navigation_item_active} text text_type_main-medium`} to='/profile'>
+              Профиль
+            </Link>
+          </li>
+          <li className={`${styles.navigation_item} text text_type_main-medium text_color_inactive`}>
+            <Link className={`${styles.navigation_item} text text_type_main-medium text_color_inactive`} to='orders'>
+              История заказов
+            </Link>
+          </li>
+          <li className={`${styles.navigation_item} text text_type_main-medium text_color_inactive`} >
+            <button className={`${styles.logout_button} text text_type_main-medium text_color_inactive`} type='button' onClick={onClickLogoutButton}>
+              Выход
+            </button>
+          </li>
+        </ul>
+        <p className="text text_type_main-default text_color_inactive mt-20">
+          В этом разделе вы можете изменить свои персональные данные
+        </p>
+      </nav>
+      <form className={styles.form} onSubmit={onClickSubmit} onReset={onReset}>
+        <Input
+          type="text"
+          value={values.name}
+          placeholder={'Имя'}
+          icon={'EditIcon'}
+          onIconClick={onIconClickName}
+          disabled={isDisabled}
+          onChange={handleChange}
+          onBlur={onBlurName}
+          ref={inputNameRef}
+          extraClass={'mb-6'}
+          name={'name'}
         />
-        <div className='ml-15'>
-          <form className={ProfileStyle.profile__form}>
-            <Input
-              type={'text'}
-              placeholder={'Имя'}
-              onChange={onChange}
-              value={data.name}
-              name={'name'}
-              icon='EditIcon'
-            />
-            <Input
-              type={'email'}
-              placeholder={'Логин'}
-              onChange={onChange}
-              value={data.email}
-              name={'email'}
-              icon='EditIcon'
-            />
-            <PasswordInput
-              type={'password'}
-              onChange={onChange}
-              value={data.password}
-              name={'password'}
-              icon='EditIcon'
-            />
-            {isChanged && (
-              <div className={ProfileStyle.profile__button_container}>
-                <Button
-                  type='secondary'
-                  size='medium'
-                  htmlType='button'
-                  onClick={cancelSubmit}
-                >
-                  Отмена
-                </Button>
-                <Button
-                  type='primary'
-                  size='medium'
-                  htmlType='submit'
-                  onClick={submitForm}
-                >
-                  Сохранить
-                </Button>
-              </div>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
+        <EmailInput
+          value={values.email}
+          placeholder={'Логин'}
+          isIcon={true}
+          onChange={handleChange}
+          extraClass={'mb-6'}
+          name={'email'}
+        />
+        <PasswordInput
+          value={values.password}
+          onChange={handleChange}
+          icon={'EditIcon'}
+          name={'password'}
+        />
+        { buttons }
+
+      </form>
+    </section>
   );
 }
-
-//  нет пропсов, нет типизации  //

@@ -1,97 +1,98 @@
-/*  
-Сверстайте страницы авторизации и регистрации с использованием библиотеки компонентов.
-Пока не нужно описывать саму функциональность регистрации.
-В качестве минимальной работы необходимо настроить переходы:
-Клик на «Войти» направляет пользователя на маршрут /login .
-Клик на «Восстановить пароль» направляет пользователя на маршрут /forgot-password.
-Формат тела запроса: { 'email': '', 'password': '', 'name': '' }
-Тело ответа, если успех: { 'success': true, 'user': { 'email': '', 'name': '' }, 
-'accessToken': 'Bearer ...', 'refreshToken': '' }
-*/
-//  Нужна шапка, хуки  //
+import { EmailInput, PasswordInput, Button, Input } from "@ya.praktikum/react-developer-burger-ui-components";
+import { useNavigate, useLocation } from "react-router-dom";
+import styles from './form.module.css';
+import { registrationRequest } from '../utils/api';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from '../hooks/useForm';
-import { AppHeader } from '../components/app-header/app-header';
-//  Из библиотеки беру кнопку, поле ввода обычно и поле пароля  //
-import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-//  action регистрации для redux  //
-import { registerUser } from '../services/actions/auth-actions';
-import RegisterStyle from './login.module.css';
+import { USER_LOGIN } from '../services/actions/auth';
+import { setCookie } from '../utils/utils';
+import { useForm } from '../hooks/use-form';
 
-export const RegisterPage = () => {
+export function RegisterPage() {
+
+  const location = useLocation();
+
+  let pathname;
+
+  location.state ? pathname = location.state.from.pathname : pathname = '/';
+ 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  //  Задаю начальное состояние данных пользователя  //
-  const { data, handleDataChange } = useForm({
+
+  const { values, handleChange } = useForm({
+    name: '',
     email: '',
-    password: '',
-    name: ''
-  });
+    password: ''
+  })
 
-  //  Обработка нажатия на кнопку регистрации  //
-  const submitRegisterUser = (e) => {
+  const onClickLoginButton = () => {
+    navigate('/login');
+  }
+
+  const onSubmitRegister = (e) => {
     e.preventDefault();
-    dispatch(registerUser(data));
-  };
 
-  //  Обработка изменений в полях ввода  //
-  /* const handleDataChange = (e) => {
-    e.preventDefault();
-    const { value, name } = e.target;
-    setData({ ...data, [name]: value });
-  };
-  */
+    registrationRequest(values)
+      .then((data) => {
+        dispatch({
+          type: USER_LOGIN,
+          email: data.user.email,
+          name: data.user.name,
+          accessToken: data.accessToken
+        });
+        setCookie('token', data.refreshToken);
+      })
+      .then(() => { 
+        navigate(pathname);
+      })
+      .catch((err) => {
+        console.log(err)
+      });
+  }
 
-  //  Разметка: шапка, flex-контейнер с grid-формой внутри  //
-  //  Стили заимствовал из логина  //
   return (
-    <div>
-      <AppHeader />
-      <div className={RegisterStyle.container}>
-        <form className={RegisterStyle.form} onSubmit={submitRegisterUser}>
-          <h1 className='text text_type_main-medium'>Регистрация</h1>
-
-          <Input
-            type={'text'}
-            placeholder={'Имя'}
-            onChange={handleDataChange}
-            value={data.name}
-            name={'name'}
-          />
-          <Input
-            type={'email'}
-            placeholder={'E-mail'}
-            onChange={handleDataChange}
-            value={data.email}
-            name={'email'}
-          />
-          <PasswordInput
-            type={'password'}
-            onChange={handleDataChange}
-            value={data.password}
-            name={'password'}
-            icon='ShowIcon'
-          />
-          <Button htmlType='submit' type='primary' size='medium'>
-            Зарегистрироваться
-          </Button>
-        </form>
-        <p className='text text_type_main-default'>
-          Уже зарегистрированы?
-          <Button
-            onClick={() => navigate('/login')}
-            htmlType='button'
-            type='secondary'
-            size='medium'
-          >
-            Войти
-          </Button>
-        </p>
-      </div>
-    </div>
+    <form className={`${styles.form}`} onSubmit={onSubmitRegister}>
+      <h2 className={`text text_type_main-medium mb-6`}>Регистрация</h2>
+      <Input
+        type="text"
+        placeholder="Имя"
+        extraClass="mb-6"
+        onChange={handleChange}
+        value={values.name}
+        name={'name'}
+      />
+      <EmailInput
+        name={'email'}
+        isIcon={false}
+        extraClass="mb-6"
+        onChange={handleChange}
+        value={values.email}
+      />
+      <PasswordInput
+        extraClass={'mb-6'}
+        onChange={handleChange}
+        value={values.password}
+        name={'password'}
+      />
+      <Button
+        htmlType="submit"
+        type="primary"
+        size="medium"
+        extraClass="mb-20"
+      >
+        Зарегистрироваться
+      </Button>
+      <p className="text text_type_main-default text_color_inactive">
+        Уже зарегистрированы?
+        <Button
+          htmlType="button"
+          type="secondary"
+          size="medium"
+          extraClass={`${styles.secondary_button}`}
+          onClick={onClickLoginButton}
+        >
+          Войти
+        </Button>
+      </p>
+    </form>
   );
 }
-
-//  нет пропсов, нет типизации  //

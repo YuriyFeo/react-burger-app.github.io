@@ -1,54 +1,75 @@
-//  Общее модальное окно для просмотра ингредиента и кнопки заказа  //
-//  Должно открывать кликнутую карточку ингредиента  //
-//  При клике на кнопку открывает пока статичное окно заказа  //
-//  Окно должно закрываться при клике на x или Esc  //
-
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import ModalOverlay from '../modal-overlay/modal-overlay';
-import { CloseIcon } from '@ya.praktikum/react-developer-burger-ui-components'
-import { modalsRoot } from '../../utils/constants';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import modalStyle from './modal.module.css';
+import styles from './modal.module.css';
+import ModalOverlay from '../modal-overlay/modal-overlay';
+import { CloseIcon } from '@ya.praktikum/react-developer-burger-ui-components';
+import { RESET_MODAL } from '../../services/actions/modal';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-//  Если уже открыто, ничего не делаю  //
-//  При монтировании вешаю слушатель на Esc  //
-//  При размонтировании убираю слушатель //
-//  Удалил isOpen больше не нужен  //
-export const Modal = ( {children, handleClose, title} ) => {
-  useEffect(() => {
-    const closeByEscape = (e) =>(e.key === 'Escape' ? handleClose() : null)
-    document.body.addEventListener('keydown', closeByEscape);
-    return () => {
-      document.body.removeEventListener('keydown', closeByEscape);  
-    };
-  }, [handleClose]);
-  
-//  Вначале рисую оверлей, поверх него размещаю окно  //
-//  Чтобы вставить модалку мимо основного корня, сделал в index #modals  //
-  return ReactDOM.createPortal (
-    (
-      <ModalOverlay handleClose={handleClose}>
-        <div className={`pt-10 pr-10 pb-15 pl-10 ${modalStyle.container}`} onClick={(e) => e.stopPropagation()}>
-          <div className={`pt-3 pb-3 ${modalStyle.header}`}>  
-            <p className='text text_type_main-large'>{title}</p> 
-            <button className={modalStyle.button_close} onClick={handleClose}>
-              <CloseIcon type='primary'/> 
-            </button>
-          </div>
+export default function Modal({ children }) {
+  const modalRoot = document.getElementById("modals");
+
+  const { isRequest, isFailed, resetActionType } = useSelector(store => store.modal);
+
+  const location = useLocation();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  function handleStopPropagation(e) {
+    e.stopPropagation();
+  }
+
+  function handleCloseModal() {
+    dispatch({
+      type: resetActionType
+    })
+    dispatch({
+      type: RESET_MODAL
+    })
+    if (location.state) {
+      navigate(location.state.background.pathname);
+    }
+  }
+
+  const modalLoading = () => {
+    if (isRequest) {
+      return (<div className={styles.modal}> <p className="text text_type_main-large">Загрузка...</p> </div>)
+    } else if (isFailed) {
+      return (<div className={styles.modal}> <p className="text text_type_main-large">Ошибка!!!</p> </div>)
+    } else {
+      return (
+        <div className={styles.modal} onClick={handleStopPropagation}>
           {children}
+          <button type='button' aria-label='закрыть' className={`${styles.close_button} mt-15 mr-10`}>
+            <CloseIcon type="primary" onClick={handleCloseModal} />
+          </button>
         </div>
-      </ModalOverlay>
-    ),
-    modalsRoot
-  )    
+      )
+    }
+  }
+
+
+  useEffect(() => {
+    function handleCloseESC(e) {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    }
+    document.addEventListener('keydown', handleCloseESC);
+
+    return () => document.removeEventListener('keydown', handleCloseESC);
+  }, [])
+
+  return ReactDOM.createPortal((
+    <ModalOverlay handleCloseModal={handleCloseModal} >
+      {modalLoading()}
+    </ModalOverlay>
+  ), modalRoot);
 }
 
-//  Проверяем пропсы без isOpen  //
 Modal.propTypes = {
-  children: PropTypes.element.isRequired,
-  title: PropTypes.string.isRequired,
-  handleClose: PropTypes.func.isRequired
+  children: PropTypes.element,
 }
-
-export default React.memo(Modal);

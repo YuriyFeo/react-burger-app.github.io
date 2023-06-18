@@ -1,21 +1,28 @@
-//  Главная страница - пока что полная копия /components/app
-import { AppHeader } from "../components/app-header/app-header";
-import { BurgerIngredients } from "../components/burger-ingredients/burger-ingredients";
-import { BurgerConstructor } from "../components/burger-constructor/burger-constructor";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { useSelector } from 'react-redux';
+import styles from './home.module.css';
+import BurgerIngredients from '../components/burger-ingredients/burger-ingredients';
+import BurgerConstructor from '../components/burger-constructor/burger-constructor';
+import Modal from '../components/modal/modal';
 import { DndProvider } from "react-dnd";
-import HomeStyle from "./home.module.css";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-export const HomePage = () => {
-  return (
-    <div>
-      <AppHeader />
-      <main className={HomeStyle.mainContainer}>
-        <DndProvider backend={HTML5Backend}>
+export function HomePage() {
+
+  const { currentModal } = useSelector(store => store.modal);
+
+  const homePage = (
+    <>
+      <DndProvider backend={HTML5Backend}>
+        <main className={styles.main}>
           <BurgerIngredients />
           <BurgerConstructor />
-        </DndProvider>
-      </main>
-    </div>
+        </main>
+      </DndProvider>
+      <Modal>
+        {currentModal}
+      </Modal>
+    </>
   );
-};
+
+  return homePage;
+}

@@ -1,0 +1,28 @@
+.image {
+  width: 240px;
+  height: 120px;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  width: 272px;
+}
+
+.item:hover {
+  cursor: pointer;
+}
+
+.item_price {
+  display: flex;
+}
+
+.item_name {
+  text-align: center;
+}
+
+.item:nth-child(2n) {
+  margin-right: 0;
+}

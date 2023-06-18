@@ -1,91 +1,109 @@
-/*  
-Страница авторизации с использованием библиотеки компонентов.
-Пока не нужно описывать саму функциональность авторизации.
-В качестве минимальной работы необходимо настроить переходы:
-Клик на «Зарегистрироваться» направляет пользователя на маршрут /register.
-Клик на «Восстановить пароль» направляет пользователя на маршрут /forgot-password.
-*/
-//  Хуки react, router-dom, redux, useForm
-import { useNavigate } from "react-router-dom";
+import { EmailInput, PasswordInput, Button } from "@ya.praktikum/react-developer-burger-ui-components";
+import { useLocation, useNavigate } from "react-router-dom";
+import styles from './form.module.css';
+import { loginRequest } from "../utils/api";
+import { USER_LOGIN } from "../services/actions/auth";
 import { useDispatch } from "react-redux";
-import { useForm } from "../hooks/useForm";
-// Шапка
-import { AppHeader } from "../components/app-header/app-header";
-//  Из библиотеки беру кнопку, поле ввода обычный инпут и поле пароля
-import {
-  Button,
-  Input,
-  PasswordInput,
-} from "@ya.praktikum/react-developer-burger-ui-components";
-//  action логина для redux
-import { loginUser } from "../services/actions/auth-actions";
-//  Стиль
-import LoginStyle from "./login.module.css";
-import {pageUrls} from "../utils/constants";
+import { setCookie } from '../utils/utils';
+import { useForm } from "../hooks/use-form";
 
-export const LoginPage = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+export function LoginPage() {
 
-  // хук для стейтов поля ввода useForm тоже пока не делаю
-  //  Задаю начальное состояние данных пользователя
-  const { data, handleDataChange } = useForm({
-    email: "",
-    password: "",
+  const location = useLocation();
+
+  const { values, handleChange } = useForm({
+    email: '',
+    password: ''
   });
 
-  const submitLogin = (e) => {
-    e.preventDefault();
-    dispatch(loginUser(data));
-  };
+  let pathname;
 
-  //  Разметка: шапка, flex-контейнер с grid-формой внутри 
+  if (location.state) {
+    pathname = location.state.from.pathname
+  } else {
+    pathname = '/'
+  }
+
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const onClickLogin = (e) => {
+    e.preventDefault();
+
+    loginRequest(values)
+      .then(data => {
+        dispatch({
+          type: USER_LOGIN,
+          email: data.user.email,
+          name: data.user.name,
+          accessToken: data.accessToken
+        });
+        setCookie('token', data.refreshToken);
+      })
+      .then(() => {
+        navigate(pathname);
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
+  const regiterButtonHandle = () => {
+    navigate('/register')
+  }
+
+  const forgotPasswordButtonHandle = () => {
+    navigate('/forgot-password')
+  }
+
   return (
-    <div>
-      <AppHeader />
-      <div className={LoginStyle.container}>
-        <form className={LoginStyle.form} onSubmit={submitLogin}>
-          <h1 className="text text_type_main-medium">Вход</h1>
-          <Input
-            type={"email"}
-            placeholder={"E-mail"}
-            onChange={handleDataChange}
-            value={data.email}
-            name={"email"}
-          />
-          <PasswordInput
-            onChange={handleDataChange}
-            value={data.password}
-            name={"password"}
-            icon="ShowIcon"
-          />
-          <Button htmlType="submit" type="primary" size="medium">
-            Войти
-          </Button>
-        </form>
-        <p className="text text_type_main-default">
-          Вы&nbsp;— новый пользователь?
-          <Button
-            onClick={() => navigate( pageUrls.reg  )}
-            htmlType="button"
-            type="secondary"
-            size="medium"
-          >
-            Зарегистрироваться
-          </Button>
-        </p>
-        <p className="text text_type_main-default">
-          Забыли пароль?
-          <Button
-            onClick={() => navigate(pageUrls.forgot)}
-            htmlType="button"
-            type="secondary"
-            size="medium"
-          >
-            Восстановить пароль
-          </Button>
-        </p>
-      </div>
-    </div>
+    <form className={`${styles.form}`} onSubmit={onClickLogin}>
+      <h2 className={`text text_type_main-medium mb-6`}>Вход</h2>
+      <EmailInput
+        name={'email'}
+        isIcon={false}
+        extraClass={`mb-6`}
+        value={values.email}
+        onChange={handleChange}
+      />
+      <PasswordInput
+        extraClass={'mb-6'}
+        value={values.password}
+        onChange={handleChange}
+        name={'password'}
+      />
+      <Button
+        htmlType="submit"
+        type="primary"
+        size="medium"
+        extraClass="mb-20"
+      >
+        Войти
+      </Button>
+      <p className="text text_type_main-default text_color_inactive">
+        Вы - новый пользователь?
+        <Button
+          htmlType="button"
+          type="secondary"
+          size="medium"
+          extraClass={`${styles.secondary_button}`}
+          onClick={regiterButtonHandle}>
+          Зарегистрироваться
+        </Button>
+      </p>
+      <p className="text text_type_main-default text_color_inactive mt-4">
+        Забыли пароль?
+        <Button
+          htmlType="button"
+          type="secondary"
+          size="medium"
+          extraClass={`${styles.secondary_button}`}
+          onClick={forgotPasswordButtonHandle}
+        >
+          Восстановить пароль
+        </Button>
+      </p>
+    </form>
   );
-};
+}

@@ -1,75 +1,80 @@
-//  Страница для сброса пароля  //
-/*  На /reset-password пользователь вводит новый пароль и код из имейла, нажимает «Сохранить». 
-    После этого происходит POST запрос к /password-reset/reset 
-    Для этого требуется создать пользователя через POST запрос к /auth/register. 
-    Пример тела запроса в ТЗ
-*/
-//  Хуки для redux, навигации, авторизации  //
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useForm } from '../hooks/useForm';
-import { changePassword } from '../services/actions/auth-actions';
-//  Шапка и компоненты из библиотеки  //
-import { AppHeader } from '../components/app-header/app-header';
-import { Button, Input, PasswordInput } from '@ya.praktikum/react-developer-burger-ui-components';
-//  Стили берем из login  //
-import PasswordStyles from './login.module.css';
+import { useEffect } from 'react';
+import { PasswordInput, Button, Input } from "@ya.praktikum/react-developer-burger-ui-components";
+import styles from './form.module.css';
+import { resetPasswordRequest } from '../utils/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from '../hooks/use-form';
 
-export const ResetPasswordPage = () => {
+export function ResetPasswordPage() {
+
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  //  Отправляю экшен, после успешного запроса, записываю данные в Redux  //
-  //  С помощью useSelector получаю доступ к данным пользователя. PROFIT!  //
-  const { hasResetCode } = useSelector((state) => state.auth);
-  const { data, handleDataChange,  } = useForm({ password: '', token: '' });
+  const location = useLocation();
 
-  const submitForgotPassword = (e) => {
+  const { values, handleChange } = useForm({
+    password: '',
+    token: ''
+  })
+
+  const onClickSubmit = (e) => {
     e.preventDefault();
-    dispatch(changePassword(data));
-    navigate('/login');
-  };
 
-  if (!hasResetCode) {
-    return <Navigate to={'/forgot-password'} />;
+    resetPasswordRequest(values)
+      .then(() => {
+        navigate('/login');
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
-  //  Разметка: шапка, flex-контейнер с grid-формой внутри  //
+  const onLoginClick = () => {
+    navigate('/login');
+  }
+
+  useEffect(() => {
+    if (location.state) {
+      location.state.pathname !== '/forgot-password' && navigate('/')
+    } else {
+      navigate('/');  
+    }
+  }, [])
+
   return (
-    <div>
-      <AppHeader />
-      <div className={PasswordStyles.container}>
-        <form className={PasswordStyles.form} onSubmit={submitForgotPassword}>
-          <h1 className='text text_type_main-medium'>Восстановление пароля</h1>
-          <PasswordInput
-            placeholder={'Введите новый пароль'}
-            onChange={handleDataChange}
-            value={data.password}
-            name={'password'}
-            icon='ShowIcon'
-          />
-          <Input
-            type={'text'}
-            placeholder={'Введите код из письма'}
-            onChange={handleDataChange}
-            value={data.token}
-            name={'token'}
-          />
-          <Button htmlType='submit' type='primary' size='medium'>
-            Сохранить
-          </Button>
-        </form>
-        <p className='text text_type_main-default'>
-          Вспомнили пароль?
-          <Button
-            onClick={() => navigate('/login')}
-            htmlType='button'
-            type='secondary'
-            size='medium'
-          >
-            Войти
-          </Button>
-        </p>
-      </div>
-    </div>
+    <form className={`${styles.form}`} onSubmit={onClickSubmit}>
+      <h2 className={`text text_type_main-medium mb-6`}>Восстановление пароля</h2>
+      <PasswordInput
+        placeholder="Введите новый пароль"
+        extraClass={'mb-6'}
+        onChange={handleChange}
+        value={values.password}
+      />
+      <Input
+        type="text"
+        placeholder="Введите код из письма"
+        extraClass="mb-6"
+        onChange={handleChange}
+        value={values.token}
+      />
+      <Button
+        htmlType="submit"
+        type="primary"
+        size="medium"
+        extraClass="mb-20"
+      >
+        Сохранить
+      </Button>
+      <p className="text text_type_main-default text_color_inactive">
+        Вспомнили пароль?
+        <Button
+          htmlType="button"
+          type="secondary"
+          size="medium"
+          extraClass={`${styles.secondary_button}`}
+          onClick={onLoginClick}
+        >
+          Войти
+        </Button>
+      </p>
+    </form>
   );
 }
